@@ -1,0 +1,23 @@
+{
+  "format": "kmm-initial-company-sql-v1",
+  "schema": 41,
+  "policy": "initial_install_only; private_drafts_and_held_research; no_auto_publication_or_notification",
+  "sql_file": "database/initial_company_data.sql",
+  "sql_sha256": "81c438f9445e5e3b5516c3ea1532e40014008f2c6eb3dbaec1eac5654fe0c381",
+  "statement_count": 130,
+  "counts": {
+    "draft_companies": 10,
+    "candidate_locations": 2,
+    "research_held": 27,
+    "link_held": 59,
+    "link_urls": 141,
+    "formal_company_id_approvals": 0
+  },
+  "pinned_sources": {
+    "database/seeds_company_2026-11-18.json": "e274f9df5739d813c46089e866cf561815078c3ff45d93fda22affcbe54559d1",
+    "docs/ACCEPTED_RESEARCH_FEED_d1.0.1.json": "21bc170942217e30308e166892b4b437c63ae7041eaf12d5368c8733434e1484",
+    "docs/research_external_links_source/JOB_LINK_CATALOG_d1.0.2.json": "e83f38320148dc283bce935d9321d3df72bcbea0b85f3f38b4cf2aed3f180cc1"
+  },
+  "external_real_mysql_status": "NOT_RUN",
+  "external_publication_approval_status": "NOT_RUN"
+}

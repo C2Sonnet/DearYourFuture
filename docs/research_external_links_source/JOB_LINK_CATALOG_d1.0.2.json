@@ -1,0 +1,1730 @@
+{
+  "project": "キミの未来へ / Toward Your Future",
+  "subproject": "情報収集",
+  "version": "d1.0.2",
+  "checked_on": "2026-11-19",
+  "link_audit_scope": "既存d1.0.0/d1.0.1の会社、保留・除外候補を含む。公開情報のみ。",
+  "definition": {
+    "official": "企業・ブランド運営側の公式サイト",
+    "recruit": "企業公式または企業が公開している採用の案内ページ。媒体採用会社一覧は備考に記載",
+    "job": "個別の求人票・募集コース・特定年度求人。採用終了ページも残す",
+    "entry": "公式エントリーフォームか求人募集上の明示的な応募導線。応募作業は実施していない"
+  },
+  "caution": "リンクの存在=27卒の応募可能性・残採用枠・個人資格を保証しない。誤同名、2028卒、中途、販売職、別勤務地へのリンクは明示。",
+  "coverage": {
+    "official": {
+      "companies": 26,
+      "urls": 26,
+      "existing": 7,
+      "added": 19
+    },
+    "recruit": {
+      "companies": 33,
+      "urls": 41,
+      "existing": 12,
+      "added": 29
+    },
+    "job": {
+      "companies": 46,
+      "urls": 66,
+      "existing": 38,
+      "added": 28
+    },
+    "entry": {
+      "companies": 8,
+      "urls": 8,
+      "existing": 0,
+      "added": 8
+    }
+  },
+  "companies": [
+    {
+      "company": "Empire State（MANHATTAN Bakery & Wine bar）",
+      "area": "東京・豊島区要町",
+      "classification": "優先",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/352120",
+          "https://www.careermap.jp/jobs/339184/p"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "複数求人で給与など相違。会社公式サイトは確認できず。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "HARBS／ハーブスグローイング",
+      "area": "東京・港区",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://www.harbs.co.jp/"
+        ],
+        "recruit": [
+          "https://en-gage.net/harbs_saiyo1/"
+        ],
+        "job": [
+          "https://job.mynavi.jp/27/pc/search/corp73544/recruiting_course27004201/recruiting_course.html?site_preference=pc",
+          "https://job.mynavi.jp/27/pc/search/corp73544/recruiting_course27004480/recruiting_course.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "マイナビ企業エントリー入口",
+      "notes": "募集コースごとに受付状況差。2027新卒募集終了表記のコースあり、全社の応募可能断定禁止。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "HUGE",
+      "area": "東京・千代田区ほか",
+      "classification": "優先",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://recruit.huge.co.jp/",
+          "https://www.careermap.jp/recruit/page_huge/position"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/351586/p"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "採用サイトの一覧に2028卒と2027卒が混在。職種・年度を固定する。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "JR東海リテイリング・プラス",
+      "area": "東京・江東区ほか",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://www.jr-plus-recruit.jp/"
+        ],
+        "recruit": [
+          "https://www.jr-plus-recruit.jp/factory/"
+        ],
+        "job": [
+          "https://jrcp-saiyo-5266.snar.jp/jobboard/detail.aspx?id=hFKxONWnnDlPEIT_FTooMw",
+          "https://job.mynavi.jp/27/pc/search/corp291213/recruiting_course27036359/recruiting_course.html?site_preference=pc"
+        ],
+        "entry": [
+          "https://jrcp-saiyo-5266.snar.jp/jobboard/detail.aspx?id=hFKxONWnnDlPEIT_FTooMw"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "新卒製造職採用ページ（応募導線あり）",
+      "notes": "総合製造初期研修・他地域配属があり得る。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "LIBERTÉ JAPON",
+      "area": "東京・武蔵野市吉祥寺",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://libertejapon.com/"
+        ],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/349996/f",
+          "https://job.inshokuten.com/kanto/work/detail/34350/fulltime/baker-boulanger"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "新卒と中途、販売・ホール兼務の違いに注意。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "NARISAWA",
+      "area": "東京・港区",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://www.narisawa-yoshihiro.com/"
+        ],
+        "recruit": [
+          "https://www.narisawa-yoshihiro.com/recruit"
+        ],
+        "job": [
+          "https://www.careermap.jp/recruit/page_narisawa_yoshihiro/position/detail/318387"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "公式採用ページでエントリー方法案内",
+      "notes": "公式のパティシエは経験者、新卒キッチンは別職種。Careermapの27卒パティシエと区別。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "Plan・Do・See",
+      "area": "東京配属未確定",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/317792/p"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "特定技能外食業の要件記載に注意。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "PÂTISSERIE ASAKO IWAYANAGI",
+      "area": "東京・世田谷区",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.patissient.com/job/f1001596/1001744/"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "新卒専用とは未確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "Raise／セテュヌボンニデー",
+      "area": "東京・目黒区ほか",
+      "classification": "優先",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/353065"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "同名企業やブランドの判別に注意。公式法人URLは今回検証不能。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "SFAD／ル・ショコラ・アラン・デュカス関連",
+      "area": "東京・中央区日本橋",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/350332"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "接客兼務、固定残業代。公式法人サイトは確認できず。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "un Grand Merci",
+      "area": "東京・多摩市",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://job.sweets-net.jp/list/un_grand_merci/index.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "販売補助と製造の兼務。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "うかい／アトリエうかい",
+      "area": "東京・八王子市ほか",
+      "classification": "最優先",
+      "links": {
+        "official": [
+          "https://www.ukai.co.jp/"
+        ],
+        "recruit": [
+          "https://www.ukai.co.jp/recruit/",
+          "https://www.ukai.co.jp/recruit/entry/fresh.html"
+        ],
+        "job": [
+          "https://www.ukai.co.jp/recruit/entry/fresh03.html"
+        ],
+        "entry": [
+          "https://www.ukai.co.jp/contact/recruit-entry.html"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "既存資料にURL収録"
+        ],
+        "recruit": [
+          "既存資料にURL収録",
+          "既存資料にURL収録"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "公式新卒応募フォーム（iframe表示）",
+      "notes": "公式フォームのメタタイトルに旧年度表記あり。2027新卒募集要項の導線から到達。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "アトリエコータ",
+      "area": "東京・新宿区",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.patissient.com/job/f1005578/"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "中途・既卒中心。27卒専用求人と混同しない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "エーデルワイス",
+      "area": "東京・江東区",
+      "classification": "優先",
+      "links": {
+        "official": [
+          "https://www.edelweiss.co.jp/"
+        ],
+        "recruit": [
+          "https://www.edelweiss.co.jp/recruit/",
+          "https://www.edelweiss.co.jp/recruit/job/"
+        ],
+        "job": [
+          "https://www.flabo.site/2027/job/131/"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "既存資料にURL収録"
+        ],
+        "recruit": [
+          "既存資料にURL収録",
+          "既存資料にURL収録"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "関東製造職と販売職、関西採用コースを混同しない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "キャトル",
+      "area": "東京・目黒区",
+      "classification": "優先",
+      "links": {
+        "official": [
+          "https://www.quatre.co.jp/"
+        ],
+        "recruit": [
+          "https://www.quatre.co.jp/recruit"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/354960/f",
+          "https://www.careermap.jp/jobs/350268",
+          "https://job.sweets-net.jp/list/quatre_kakinoki/index.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "パン製造と洋菓子製造を別求人として記録。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "グリーンハウスフーズ（PARIYA）",
+      "area": "東京各店・工房",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.itnavi.jp/details/409319129/"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "新卒の専門職求人とは別の中途掲載も存在。特定技能の条件確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "グローバルダイニング",
+      "area": "東京・港区",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://en-gage.net/global-dining_jobs/"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/seminars/262317",
+          "https://job-gear.net/globaldining2/all/NXX_6_20_DUD%2CID/MLkyujin_l.htm"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "セミナーURLは個別求人票ではない。パン製造の時給職も混在。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "スペシャリティーズ（OIMO/MOTCH）",
+      "area": "東京・世田谷区三軒茶屋",
+      "classification": "優先",
+      "links": {
+        "official": [
+          "https://www.specialities.jp/"
+        ],
+        "recruit": [
+          "https://specialities-online.com/?mode=f11"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/345164"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "公式採用案内は文字化けで直接本文全文の検証に制限。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "タイソンズアンドカンパニー",
+      "area": "東京・品川区ほか",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://www.tysons.jp/recruit"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/317927/f",
+          "https://www.careermap.jp/corporations/35193/jobs"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "当該27卒はキッチン全般の仕事。ブーランジェ専任とは限らない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "トップス（洋菓子／赤坂トップス）",
+      "area": "東京・目黒区",
+      "classification": "優先",
+      "links": {
+        "official": [
+          "https://www.akasaka-tops.co.jp/"
+        ],
+        "recruit": [
+          "https://www.akasaka-tops.co.jp/recruit/"
+        ],
+        "job": [
+          "https://www.flabo.site/2027/job/315/"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "公式採用ページ内に27卒エントリー表示",
+      "notes": "同名の別業種「トップス」と混同しない。27卒製菓専門向けの表示はあるがフォームURL未確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "パティスリー・サダハル・アオキ・パリ",
+      "area": "東京・大田区ほか",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://www.sadaharuaoki.jp/"
+        ],
+        "recruit": [
+          "https://www.sadaharuaoki.jp/recruit/"
+        ],
+        "job": [
+          "https://www.sadaharuaoki.fr/recruit/ja.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "既存資料にURL収録"
+        ],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "公式採用ページに応募方法掲載",
+      "notes": "2027卒限定の募集フォームではない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "パティスリー・ナガキタ",
+      "area": "東京・江戸川区瑞江",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://patisserie-nagakita.jp/"
+        ],
+        "recruit": [],
+        "job": [
+          "https://job.sweets-net.jp/list/nagakita/index.html",
+          "https://www.careermap.jp/jobs/355058",
+          "https://www.patissient.com/job/f373027/"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "Patissientは掲載終了、Sweetsnet等では掲載あり。各媒体別に状態を記録。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ヒネル（YOYO）",
+      "area": "東京・世田谷区",
+      "classification": "優先",
+      "links": {
+        "official": [
+          "https://hineru.co.jp/"
+        ],
+        "recruit": [
+          "https://hineru.co.jp/shop/yoyo/"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/355305/f",
+          "https://www.careermap.jp/jobs/355303"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充",
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "本社HPのショップ情報は採用ページではない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ピエール・エルメ・パリ",
+      "area": "東京・江戸川区",
+      "classification": "最優先",
+      "links": {
+        "official": [
+          "https://www.pierreherme.co.jp/"
+        ],
+        "recruit": [
+          "https://www.pierreherme.co.jp/recruitment/?from=btn"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/351699/f",
+          "https://www.careermap.jp/jobs/351697/f"
+        ],
+        "entry": [
+          "https://www.pierreherme.co.jp/contact/recruitment"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "既存資料にURL収録"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "公式応募フォーム（27卒専用ではない）",
+      "notes": "求人は新卒/既卒別。フォームのパティシエ枠は募集年度との対応を確認する。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ブランジェ浅野屋",
+      "area": "東京・板橋区",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://b-asanoya.com/"
+        ],
+        "recruit": [
+          "https://arwrk.net/recruit/rgo4294giw2flc4/"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/331768/f"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "採用サイト／求人媒体内応募導線",
+      "notes": "包装・仕分け業務が含まれる。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ポンパドウル",
+      "area": "東京各店（初期配属は要確認）",
+      "classification": "優先",
+      "links": {
+        "official": [
+          "https://www.pompadour.co.jp/"
+        ],
+        "recruit": [
+          "https://www.pompadour.co.jp/boshu2/pompadour/"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/354012/f",
+          "https://job.mynavi.jp/27/pc/search/corp38298/recruiting_course27038769/recruiting_course.html?site_preference=pc"
+        ],
+        "entry": [
+          "https://www.pompadour.co.jp/boshu2/pompadour/entry/"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "公式新卒エントリー案内（同ページ内）",
+      "notes": "東京配属を確約するページではない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "メゾン・ランドゥメンヌ・ジャポン",
+      "area": "東京・港区麻布台",
+      "classification": "優先",
+      "links": {
+        "official": [
+          "https://www.maisonlandemainejapon.com/"
+        ],
+        "recruit": [
+          "https://www.maisonlandemainejapon.com/recruit",
+          "https://www.maisonlandemainejapon.com/recruit/new-graduate"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/311963/f"
+        ],
+        "entry": [
+          "https://www.maisonlandemainejapon.com/recruit/new-graduate"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "公式新卒募集兼エントリー案内",
+      "notes": "公式の「エントリーする」は同一ページ内リンクとして確認。独立フォームURL未確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ラ・プレシューズ紀尾井町",
+      "area": "東京・千代田区",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://job.sweets-net.jp/list/precieuse_kioichou/index.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募フォーム案内",
+      "notes": "公式企業サイトとの照合が必要。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ル・サントノーレ／ヴォアラ",
+      "area": "東京・世田谷区",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://patisserie-saint-honre.com/"
+        ],
+        "recruit": [
+          "https://patisserie-saint-honre.com/recruit/"
+        ],
+        "job": [
+          "https://www.careermap.jp/recruit/page_saint_honre/position/detail/348598",
+          "https://job.sweets-net.jp/group/tokinoha.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "既存資料にURL収録"
+        ],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "公式募集ページ内の応募方法案内",
+      "notes": "製造配属でも販売研修あり。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ワイズテーブルコーポレーション",
+      "area": "東京各店",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/recruit/page_ystable/position/detail/320991"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "調理兼務あり。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "中条商事／中国飯店グループ",
+      "area": "東京・港区",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/353766"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "募集媒体内応募導線",
+      "notes": "飲食店のサービス研修とパティシエ職の兼務。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "丸十ベーカリーシャルン",
+      "area": "東京・調布市／神奈川",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://en-gage.net/kenbokun_saiyo/"
+        ],
+        "job": [
+          "https://app.careermap.jp/jobs/327898/p",
+          "https://job.mynavi.jp/27/pc/search/corp252642/recruiting_course27050472/recruiting_course.html?site_preference=pc"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "採用媒体内エントリー",
+      "notes": "製造・販売をローテーションするコースに注意。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "井上商事／スイーツパラダイス",
+      "area": "勤務地未確約",
+      "classification": "条件付き",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://job.sweets-net.jp/list/sweetsparadise-shinsotsu/"
+        ],
+        "job": [
+          "https://www.careermap.jp/recruit/page_sweets_paradise/position/detail/328664",
+          "https://job.mynavi.jp/27/pc/search/corp270435/outline.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "新卒エントリー案内あり（媒体経由）",
+      "notes": "製造と店舗販売は職種別に区別。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "小川珈琲クリエイツ",
+      "area": "東京・港区高輪",
+      "classification": "優先",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://job.mynavi.jp/27/pc/search/corp293117/recruiting_course27071992/recruiting_course.html?site_preference=pc",
+          "https://www.careermap.jp/corporations/88298/jobs"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "今回の公開Web調査で補充",
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "マイナビ会員エントリー",
+      "notes": "27卒パティシエ職のコース番号を識別。旧掲載との締切差あり。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "手作り菓子工房うふ",
+      "area": "東京・江東区",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://www.tedukuri-oeuf.com/"
+        ],
+        "recruit": [
+          "https://www.tedukuri-oeuf.com/recruit/"
+        ],
+        "job": [
+          "https://job.sweets-net.jp/list/tedukuri_oeuf/index.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "公式採用案内は電話／店頭中心",
+      "notes": "製造＋販売。オンラインエントリー確定していない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "日本エアポートデリカ",
+      "area": "東京・大田区羽田",
+      "classification": "条件付き",
+      "links": {
+        "official": [
+          "https://www.airdeli.co.jp/"
+        ],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/354531"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "総合職、開発配属確定せず。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "朋和産業",
+      "area": "千葉・船橋市ほか",
+      "classification": "専門性異なる（包装資材）",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://www.recruit-howa-s.jp/",
+          "https://www.recruit-howa-s.jp/recruit/"
+        ],
+        "job": [
+          "https://job.mynavi.jp/27/pc/search/corp75149/recruiting_course27031227/recruiting_course.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "マイナビ会員エントリー",
+      "notes": "食品の中身ではなく包装材の研究開発。勤務地は地域要確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "MareFox",
+      "area": "神奈川・横浜市中区",
+      "classification": "都外",
+      "links": {
+        "official": [
+          "https://www.marefox-mare.com/"
+        ],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/353453"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "既存資料にURL収録"
+        ],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "求人媒体内応募導線",
+      "notes": "MareFox法人ページはOEM/ODM紹介、採用ページ独立表示なし。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ゲートグルメジャパン",
+      "area": "千葉・成田市",
+      "classification": "都外",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://gategroup.official.career/"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "公式採用サイト内の求人検索",
+      "notes": "公式で国籍・年齢・性別の多様性を記載。27卒専門製造の個別求人URLは未収集。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "コロンバン",
+      "area": "埼玉・加須市（27卒パティシエ製造）",
+      "classification": "都外",
+      "links": {
+        "official": [
+          "https://www.colombin.co.jp/"
+        ],
+        "recruit": [
+          "https://www.colombin.co.jp/recruit/",
+          "https://www.colombin.co.jp/recruit/requirements/"
+        ],
+        "job": [
+          "https://job.mynavi.jp/27/pc/search/corp76847/recruiting_course27057428/recruiting_course.html?site_preference=smartphone"
+        ],
+        "entry": [
+          "https://www.colombin.co.jp/recruit/entry/"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "公式応募フォーム（27卒の正式案内はマイナビ）",
+      "notes": "27卒公式の製造・開発勤務地は埼玉加須。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ジェリービーンズ（食肉加工）",
+      "area": "千葉・多古町",
+      "classification": "都外",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://job.mynavi.jp/27/pc/search/corp235035/recruiting_course27000971/recruiting_course.html",
+          "https://www.agri-navi.com/jobdetail/38752"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "マイナビ会員エントリー",
+      "notes": "同名の靴・アパレル企業（ジェリービーンズグループ）と混同しない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ピーターパン",
+      "area": "千葉・船橋市ほか",
+      "classification": "都外",
+      "links": {
+        "official": [
+          "https://peaterpan.com/"
+        ],
+        "recruit": [
+          "https://peaterpan.com/recruiting/"
+        ],
+        "job": [
+          "https://www.careermap.jp/jobs/308594/f",
+          "https://peaterpan-recruit.snar.jp/jobboard/detail.aspx?id=mgOyTcnQacI"
+        ],
+        "entry": [
+          "https://peaterpan-recruit.snar.jp/jobboard/detail.aspx?id=mgOyTcnQacI"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "既存資料にURL収録",
+          "今回の公開Web調査で補充"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "27卒新卒募集ページ（応募導線含む）",
+      "notes": "2028卒新卒求人ページも出るため27卒を固定。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ブールミッシュ",
+      "area": "神奈川・川崎市",
+      "classification": "都外",
+      "links": {
+        "official": [
+          "https://boulmich.co.jp/"
+        ],
+        "recruit": [
+          "https://boulmich.co.jp/emploi/",
+          "https://boulmich-saiyo.jp/-/top/index.html"
+        ],
+        "job": [
+          "https://boulmich-saiyo.jp/job/-/info/detail/M0000216",
+          "https://job.sweets-net.jp/list/boulmich/index.html"
+        ],
+        "entry": [
+          "https://boulmich-saiyo.jp/job/-/info/detail/M0000216"
+        ]
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充",
+          "既存資料にURL収録"
+        ],
+        "entry": [
+          "今回の公開Web調査で補充"
+        ]
+      },
+      "entry_type": "2027新卒パティシエの採用ページ（応募導線含む）",
+      "notes": "川崎と大阪の募集を取り違えない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "戸田フーズ",
+      "area": "埼玉・戸田市ほか",
+      "classification": "都外",
+      "links": {
+        "official": [
+          "https://todafoods.jp/"
+        ],
+        "recruit": [
+          "https://todafoods.jp/recruit/",
+          "https://todafoods.jp/recruit/requirement.html"
+        ],
+        "job": [
+          "https://job.mynavi.jp/27/pc/corpinfo/displayEmployment/index?corpId=112163&recruitingCourseId=27009166"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "今回の公開Web調査で補充"
+        ],
+        "recruit": [
+          "今回の公開Web調査で補充",
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "マイナビ会員エントリー",
+      "notes": "商品開発・品質管理の独立配属が確約されるかは公開情報で不明。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "月島食品工業",
+      "area": "求人は大阪府",
+      "classification": "東京候補から除外",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://www.careermap.jp/jobs/314187/f"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "勤務地不一致",
+      "notes": "東京本社だけで東京勤務と認定しない。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "清水物産潮来FP",
+      "area": "茨城・潮来市",
+      "classification": "都外・遠距離",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://en-gage.net/smz-products_saiyo2/"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "採用媒体の求人一覧",
+      "notes": "公開求人の技術開発職が同じ年度か未確認。一般事務・ライン作業は対象外。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "EQUALLY",
+      "area": "東京・世田谷区",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "新卒第二新卒受入の旧情報あり。27卒専用求人URL未確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "Q-pot CAFE.",
+      "area": "東京・渋谷区",
+      "classification": "除外・保留",
+      "links": {
+        "official": [
+          "https://q-pot.jp/"
+        ],
+        "recruit": [
+          "https://q-pot.jp/news_archive/2026recruit/"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "既存資料にURL収録"
+        ],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "2026-11-13二次募集終了、当初契約社員。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "わらべや日洋食品（商品開発）",
+      "area": "東京近郊",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "https://job.mynavi.jp/27/pc/search/corp260536/recruiting_course27005927/recruiting_course.html"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [
+          "既存資料にURL収録"
+        ],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "商品開発職の2027募集終了と以前確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "アイビーカンパニー",
+      "area": "東京",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://ivy-recruit.snar.jp/jobboard/detail.aspx?id=q0n2aCKblSc"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "2027パティシエ職終了の表示。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "オールハーツ・カンパニー",
+      "area": "東京各地",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "販売と製造兼務、個別27卒採用ページは再確認必要。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "カイカイキキ／となりの開花堂",
+      "area": "東京・中野区",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://hrmos.co/pages/kaikaikiki/jobs"
+        ],
+        "job": [
+          "https://hrmos.co/pages/kaikaikiki/jobs/2088199320320565328"
+        ],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "今回の公開Web調査で補充"
+        ],
+        "job": [
+          "今回の公開Web調査で補充"
+        ],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "27卒の製菓求人は契約社員のため正社員条件外。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "クリオロ",
+      "area": "東京・板橋区",
+      "classification": "除外・保留",
+      "links": {
+        "official": [
+          "https://ecolecriollo.com/"
+        ],
+        "recruit": [
+          "https://ecolecriollo.com/newgraduates/"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [
+          "既存資料にURL収録"
+        ],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "二次募集の旧締切、追加募集確認なし。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "シェ松尾",
+      "area": "東京",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [
+          "https://chez-matsuo.co.jp/newgrad/"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [
+          "既存資料にURL収録"
+        ],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "旧募集2026-10-19締切。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "デリカウェーブ",
+      "area": "神奈川・横須賀市",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "一般製造・生産管理が中心となり得る。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ハット・トリック",
+      "area": "東京・荒川区",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "旧製菓職紹介あり、製造工程の専門性・URL未確認。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "メトロ製菓",
+      "area": "東京",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "包装・梱包配属可能性があり技術専任条件では留保。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "ル パティシエ タカギ",
+      "area": "東京・世田谷区",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "27卒募集ページの存在を今回確認できず。",
+      "checked_date": "2026-11-19"
+    },
+    {
+      "company": "日本ガストロノミー研究所／シェリュイ",
+      "area": "東京・大田区ほか",
+      "classification": "除外・保留",
+      "links": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "source_status": {
+        "official": [],
+        "recruit": [],
+        "job": [],
+        "entry": []
+      },
+      "entry_type": "個別フォーム未確認",
+      "notes": "企業実績は過去資料にあるが27卒公開求人URLを今回未確認。",
+      "checked_date": "2026-11-19"
+    }
+  ]
+}

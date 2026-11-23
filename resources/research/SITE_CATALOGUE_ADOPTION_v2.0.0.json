@@ -1,0 +1,20 @@
+{
+  "format": "kmm-site-catalogue-adoption-v1",
+  "site_version": "2.0.0",
+  "adopted_on": "2026-11-23",
+  "source_subproject": "情報収集",
+  "source_release": "d1.0.4 R07 Batch50",
+  "source_path": "resources/research/r07-current/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH50_20261123.json",
+  "source_sha256": "7cdba7f406af45c2b3c5f6bfa5f91279c37082632acf45485f7aa5e525c348f5",
+  "site_status": "APPROVED_SITE_CATALOGUE",
+  "use_as": "primary_current_company_and_job_catalogue",
+  "companies": 112,
+  "jobs": 143,
+  "source_research_status": "partial_not_final",
+  "former_base": "d1.0.4 R06 initial SQL and immutable historical crosswalk",
+  "retains_source_fields": true,
+  "no_unverified_hiring_claims": true,
+  "user_data_overwrite": false,
+  "research_source_unchanged": true,
+  "scope_note": "This is an owner-approved SITE dataset designation, NOT certification of public research findings or of recruitment eligibility."
+}

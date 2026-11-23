@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "seed_version": "research-2026-11-18-v1",
+  "source_document": "https://drive.google.com/file/d/1CbNnmfh4pfFW7R_2m-1ZeXaQYC2TDjBP/view",
+  "source_checked_on": "2026-11-18",
+  "publication_rule": "initial_drafts_only; independent source review required",
+  "companies": [
+    {"key":"ph-paris-japon","display_name":"PH PARIS JAPON（ピエール・エルメ・パリ）","note":"製菓職の候補。募集残枠・応募条件・勤務地は再確認が必要。"},
+    {"key":"ukai","display_name":"株式会社うかい（アトリエうかい）","note":"工房とレストラン等の配属先を区別する。"},
+    {"key":"tops","display_name":"株式会社トップス","note":"東京と茨城の勤務候補を区別。締切情報は調査日時点の参考。"},
+    {"key":"edelweiss","display_name":"株式会社エーデルワイス","note":"製菓・製パンの職種と配属工程を区別。"},
+    {"key":"quatre","display_name":"株式会社キャトル","note":"製菓・製パン関連候補。2027年の受付状況は再確認。"},
+    {"key":"raise","display_name":"Raise／セテュヌボンニデー","note":"東京と神奈川の配属候補があるため勤務地確約は未確認。"},
+    {"key":"marefox","display_name":"株式会社MareFox","note":"報告書記載の本社住所と求人の勤務先住所に相違。どちらも現在の確定拠点ではない。","locations":[{"name":"資料掲載の本社候補","kind":"headquarters","address":"神奈川県横浜市中区山下町73","verification_state":"candidate","note":"2026-11-18調査時点の会社サイト表記。所在地の直接再確認が必要。"},{"name":"求人記載の勤務先候補","kind":"development","address":"神奈川県横浜市中区山下町27","verification_state":"candidate","note":"2026-11-18調査時点の求人記載。実勤務地としての確約は未確認。"}]},
+    {"key":"peterpan","display_name":"株式会社ピーターパン","note":"千葉県の製パン専門職候補。都内勤務地は確認されていない。"},
+    {"key":"pompadour","display_name":"ポンパドウル","note":"製パン職候補。勤務地の東京限定可否は未確認。"},
+    {"key":"asanoya","display_name":"株式会社浅野屋","note":"ブランジェ浅野屋。職種・勤務地・募集状況は再確認。"}
+  ]
+}

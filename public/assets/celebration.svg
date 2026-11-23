@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="132" viewBox="0 0 240 132" role="img" aria-label="花とリボンのお祝い装飾">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M119 22c-9-21-34-18-33-3 0 11 16 17 33 17 17 0 33-6 33-17 1-15-24-18-33 3Z" fill="#ffbe9c" stroke="#d88472" stroke-width="2"/>
+    <circle cx="119" cy="35" r="12" fill="#ffe0b6" stroke="#d88472" stroke-width="2"/>
+    <path d="m113 47-22 68 27-17 18 19-14-71" fill="#f9a6a5" stroke="#d88472" stroke-width="2"/>
+    <path d="M60 65c-9-17-13-15-14 0-14-6-18-1-7 12-11 10-6 17 10 13 5 14 12 14 18 0 15 4 19-3 9-15 9-13 4-17-9-10" fill="#ffd6bd" stroke="#e7ab91" stroke-width="2"/>
+    <circle cx="58" cy="76" r="10" fill="#fff5c2" stroke="#e7ab91"/>
+    <path d="M180 65c-9-17-13-15-14 0-14-6-18-1-7 12-11 10-6 17 10 13 5 14 12 14 18 0 15 4 19-3 9-15 9-13 4-17-9-10" fill="#ecd8f8" stroke="#c7a1d2" stroke-width="2"/>
+    <circle cx="178" cy="76" r="10" fill="#fff5c2" stroke="#c7a1d2"/>
+  </g>
+  <g fill="#f5b89c"><circle cx="18" cy="42" r="4"/><circle cx="215" cy="36" r="5"/><circle cx="226" cy="103" r="3"/></g>
+  <g fill="#d8bbef"><circle cx="25" cy="104" r="3"/><circle cx="208" cy="119" r="3"/></g>
+</svg>

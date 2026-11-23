@@ -1,0 +1,18 @@
+{
+  "name": "c2sonnet/kimino-mirai",
+  "description": "Toward Your Future - job research and application management",
+  "type": "project",
+  "license": "CC-BY-SA-4.0",
+  "require": {
+    "php": "^8.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "KMM\\": "app/"
+    }
+  },
+  "scripts": {
+    "test": "php tests/run.php"
+  },
+  "version": "2.0.0"
+}
