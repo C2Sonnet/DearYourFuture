@@ -4,9 +4,15 @@ namespace KMM\Core;
 use PDO;
 final class AccountController {
     public static function isRoute(string $path): bool {
-        return in_array($path,['/account/login','/admin/login','/account/logout','/account/forgot-password','/account/reset-password','/account/kimi/ack'],true);
+        return in_array($path,['/account/login','/admin/login','/account/logout','/account/forgot-password','/account/reset-password','/account/kimi/ack','/account/notices/dismiss'],true);
     }
     public static function handle(string $path,string $method): void {
+        if($path==='/account/notices/dismiss'){
+            if($method!=='POST'){header('Allow: POST');http_response_code(405);return;}
+            if(Identity::current()===null||!Session::validCsrf((string)($_POST['csrf']??''))){http_response_code(403);return;}
+            unset($_SESSION['kmm_login_notice_flash_v1']);
+            header('Location: '.Session::safeReturn((string)($_POST['next']??'/')),true,303);return;
+        }
         if($path==='/account/kimi/ack'){
             header('Content-Type: application/json; charset=utf-8');
             header('Cache-Control: no-store, private');
@@ -75,7 +81,13 @@ final class AccountController {
             '<label>パスワード<input type="password" name="password" autocomplete="current-password" required></label>'.
             ($adminOnly?'':'<a class="text-link" href="/account/forgot-password">パスワードは忘れましたか？</a>').
             '<button type="submit" class="btn primary">ログインする</button>';
-        $html.='</form>';Kernel::layout('ログイン',$html,false);
+        $html.='</form>';
+        if(!$adminOnly){
+            try {if(RegistrationController::enabled(Database::connected()))
+                $html.='<p class="note"><a class="text-link" href="/account/register">はじめての方はこちら（新規登録）</a></p>';}
+            catch(\Throwable $e){/* legacy DB: optional sign-up remains hidden */}
+        }
+        Kernel::layout('ログイン',$html,false);
     }
     private static function reset(string $path,string $method): void {
         if(!in_array($method,['GET','POST'],true)){header('Allow: GET, POST');self::message('操作できません','許可された方法ではありません。',405);return;}

@@ -17,10 +17,10 @@ final class Security {
         }elseif(parse_url((string)($_SERVER['REQUEST_URI']??''),PHP_URL_PATH)==='/site-resources'){
             header("Content-Security-Policy: default-src 'none'; style-src 'self' https://cdn.jsdelivr.net; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; object-src 'none'");
         }elseif(parse_url((string)($_SERVER['REQUEST_URI']??''),PHP_URL_PATH)==='/'){
-            header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; object-src 'none'");
+            header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; object-src 'none'");
         }else{header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; object-src 'none'");}
         header('X-Robots-Tag: noindex, nofollow, noarchive');
-        header('Cache-Control: no-store, private');
+        header('Cache-Control: no-store, private, no-transform');
     }
     public static function previewAllowed(): bool {
         $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');

@@ -3,14 +3,14 @@ declare(strict_types=1);
 namespace KMM\Core;
 use PDO;
 
-/** Site-adopted, pinned d1.0.4 R07 Batch50 current catalogue.
+/** Site-adopted, pinned d1.0.4 R07 Batch66 current catalogue.
  * The R07 source has its own partial/not-final research-review status; site adoption
  * does not certify each job's recruiting status or applicant eligibility.
  * Research originals, user-created records, and R06 historical seed are not rewritten.
  */
 final class ResearchR07 {
-    public const RELEASE = 'd1.0.4 R07 Batch50（サイト採用データ集）';
-    public const FILE_SHA256 = '7cdba7f406af45c2b3c5f6bfa5f91279c37082632acf45485f7aa5e525c348f5';
+    public const RELEASE = 'd1.0.4 R07 Batch66（サイト採用データ集）';
+    public const FILE_SHA256 = '31c5a2cc629600075cdad706ed763eadbfe7ef3cb290674b7da43ad052ce93a6';
     private static ?array $snapshot = null;
     private static ?array $lookups = null;
     private static ?array $mapping = null;
@@ -19,29 +19,29 @@ final class ResearchR07 {
     public static function root():string {return SiteState::root().'/resources/research/r07-current';}
     public static function data():array {
         if(self::$snapshot!==null)return self::$snapshot;
-        $path=self::root().'/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH50_20261123.json';
+        $path=self::root().'/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH66_20261124.json';
         if(!is_file($path)||!hash_equals(self::FILE_SHA256,(string)hash_file('sha256',$path)))
             throw new \RuntimeException('R07 source integrity mismatch');
         // The owner's SITE approval is distinct from the source research audit status.
         // Fail closed if an unapproved or modified catalogue is deployed.
-        $siteAdoption=SiteState::root().'/resources/research/SITE_CATALOGUE_ADOPTION_v2.0.0.json';
+        $siteAdoption=SiteState::root().'/resources/research/SITE_CATALOGUE_ADOPTION_v2.6.0.json';
         $approvalRaw=@file_get_contents($siteAdoption);
         if(!is_string($approvalRaw)||strlen($approvalRaw)>16384)
             throw new \RuntimeException('Site catalogue adoption record missing');
         $approval=json_decode($approvalRaw,true,16,JSON_THROW_ON_ERROR);
         if(!is_array($approval)
             ||($approval['format']??null)!=='kmm-site-catalogue-adoption-v1'
-            ||($approval['site_version']??null)!=='2.0.0'
+            ||($approval['site_version']??null)!=='2.6.0'
             ||($approval['site_status']??null)!=='APPROVED_SITE_CATALOGUE'
-            ||($approval['source_release']??null)!=='d1.0.4 R07 Batch50'
-            ||($approval['source_path']??null)!=='resources/research/r07-current/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH50_20261123.json'
+            ||($approval['source_release']??null)!=='d1.0.4 R07 Batch66'
+            ||($approval['source_path']??null)!=='resources/research/r07-current/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH66_20261124.json'
             ||($approval['source_sha256']??null)!==self::FILE_SHA256
-            ||($approval['companies']??null)!==112||($approval['jobs']??null)!==143
+            ||($approval['companies']??null)!==113||($approval['jobs']??null)!==146
             ||($approval['source_research_status']??null)!=='partial_not_final'
             ||($approval['user_data_overwrite']??null)!==false)
             throw new \RuntimeException('Site catalogue adoption record invalid');
         $d=json_decode((string)file_get_contents($path),true,128,JSON_THROW_ON_ERROR);
-        if(!is_array($d)||count($d['companies']??[])!==112||count($d['jobs']??[])!==143)
+        if(!is_array($d)||count($d['companies']??[])!==113||count($d['jobs']??[])!==146)
             throw new \RuntimeException('Unsupported R07 research release');
         $companies=[];$jobs=[];
         foreach($d['companies'] as $company){
@@ -79,7 +79,7 @@ final class ResearchR07 {
     public static function mapping(PDO $db):array {
         if(self::$mapping!==null)return self::$mapping;
         $m=['companies'=>[],'jobs'=>[],'companies_rev'=>[],'jobs_rev'=>[]];
-        $stmt=$db->prepare("SELECT record_type,record_id,base_json FROM seed_entity_states WHERE seed_version='research-d1.0.4-R06' AND record_type IN ('companies','jobs') LIMIT 500");
+        $stmt=$db->prepare("SELECT record_type,record_id,base_json FROM seed_entity_states WHERE seed_version IN ('research-d1.0.4-R06','research-d1.0.4-R07-site') AND record_type IN ('companies','jobs') LIMIT 10000");
         $stmt->execute();
         foreach($stmt->fetchAll(PDO::FETCH_ASSOC) as $row){
             $type=(string)($row['record_type']??'');if(!isset($m[$type]))continue;
@@ -94,6 +94,7 @@ final class ResearchR07 {
         }
         return self::$mapping=$m;
     }
+    public static function invalidateMapping():void {self::$mapping=null;}
     public static function dbId(PDO $db,string $type,string $sourceId):?string {return self::mapping($db)[$type][$sourceId]??null;}
     public static function sourceId(PDO $db,string $type,string $dbId):?string {return self::mapping($db)[$type.'_rev'][$dbId]??null;}
     public static function companyUrl(PDO $db,string $sourceId):string {

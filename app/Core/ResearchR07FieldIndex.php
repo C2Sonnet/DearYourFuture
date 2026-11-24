@@ -3,23 +3,23 @@ declare(strict_types=1);
 namespace KMM\Core;
 
 /**
- * Read-only detailed source fields for d1.0.4 R07 Batch50.
+ * Read-only detailed source fields for d1.0.4 R07 Batch66.
  * Source values, unverified statuses and separate course labels are preserved.
  * This is a snapshot index, never a DB update or evidence verification.
  */
 final class ResearchR07FieldIndex {
-    private const INDEX_SHA256 = '1b1ede4757e328b1fd0a11ca8f5d6d6f031ef031b3ab819c98613d936daaadc3';
+    private const INDEX_SHA256 = 'da1fee5d5fa51400170277a55c488ad21ad34fc779bb1c40b0918d211d0cf84f';
     private static ?array $index = null;
 
     private static function all(): array {
         if (self::$index !== null) return self::$index;
-        $path = ResearchR07::root().'/RESEARCH_FIELD_INDEX_d1.0.4_R07_BATCH50.json';
+        $path = ResearchR07::root().'/RESEARCH_FIELD_INDEX_d1.0.4_R07_BATCH66.json';
         if (!is_file($path) || !hash_equals(self::INDEX_SHA256, (string)hash_file('sha256', $path))) {
             throw new \RuntimeException('R07 field-index integrity mismatch');
         }
         $decoded = json_decode((string)file_get_contents($path), true, 128, JSON_THROW_ON_ERROR);
         if (!is_array($decoded) || ($decoded['source_sha256']??'') !== ResearchR07::FILE_SHA256
-            || count($decoded['jobs']??[]) !== 143 || count($decoded['companies']??[]) !== 112) {
+            || count($decoded['jobs']??[]) !== 146 || count($decoded['companies']??[]) !== 113) {
             throw new \RuntimeException('R07 field-index record mismatch');
         }
         return self::$index = $decoded;
@@ -48,7 +48,7 @@ final class ResearchR07FieldIndex {
         $count = 0;
         foreach ($groups as $rows) $count += is_array($rows) ? count($rows) : 0;
         $html = '<section class="section r07-field-index" aria-label="'.Security::h($label).'の原典追加項目">'
-            .'<h2>原典の追加項目</h2><p class="r07-field-intro">R07 Batch50の現行記録に収録された項目を、情報源・コースごとに独立表示します（'.(int)$count.'項目）。'
+            .'<h2>原典の追加項目</h2><p class="r07-field-intro">R07 Batch66の現行記録に収録された項目を、情報源・コースごとに独立表示します（'.(int)$count.'項目）。'
             .'「false（原典値）」は確認フラグであり、応募不可や募集終了の確定ではありません。別募集・別年度の条件をこの求人に自動適用しません。</p>';
         $groupNumber = 0;
         foreach ($groups as $group => $rows) {
@@ -63,15 +63,15 @@ final class ResearchR07FieldIndex {
                 $value = $item['value']??null;
                 $source = $item['source']??null;
                 $path = $item['path']??null;
-                if (!is_string($fieldLabel) || !is_string($value) || trim($value) === '') continue;
+                if (!is_string($fieldLabel) || !is_string($value) || trim($value) === '' || in_array(strtolower(trim($value)),['null','true','false'],true) || str_starts_with($fieldLabel,'原典項目：') || $fieldLabel==='原典記録') continue;
+                if(in_array(strtolower($value),['unknown','unreviewed','unverified'],true))$value='不明';
+                if(preg_match('/\A[a-z0-9]+(?:_[a-z0-9]+)+\z/i',$value))continue;
                 $html .= '<tr><th scope="row">'.Security::h($fieldLabel).'</th><td>'
                     .'<div class="r07-field-value">'.Security::h($value).'</div>';
                 if (is_string($source) && $source !== '') {
                     $html .= '<small class="r07-field-source">出典区分：'.Security::h($source).'</small>';
                 }
-                if (is_string($path) && $path !== '') {
-                    $html .= '<small class="r07-field-path">原典項目：'.Security::h($path).'</small>';
-                }
+                
                 $html .= '</td></tr>';
             }
             $html .= '</tbody></table></div></details>';

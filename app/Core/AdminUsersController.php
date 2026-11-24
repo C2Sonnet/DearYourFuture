@@ -114,7 +114,7 @@ final class AdminUsersController {
         if(preg_match('~\A/admin/users/([1-9][0-9]{0,17})/recover-invitation\z~D',$path,$recover)){
             if($method!=='POST'){self::error(405,'POSTのみ');return;}
             if(!self::csrfAndFresh()){self::error(403,'再ログインが必要です。');return;}
-            if(!in_array($role,['FOUNDER','DEVELOPER'],true)){self::error(403,'復旧承認権限がありません。');return;}
+            if(!($role==='DEVELOPER')){self::error(403,'復旧承認権限がありません。');return;}
             $userId=(int)$recover[1];
             $q=$db->prepare('SELECT u.id,u.email,u.status,ur.role_code AS role FROM users u JOIN user_roles ur ON ur.user_id=u.id WHERE u.id=?');
             $q->execute([$userId]);$row=$q->fetch(PDO::FETCH_ASSOC);
@@ -187,7 +187,7 @@ final class AdminUsersController {
         }
         // The review step is deliberately separate from the actual resend.
         if($pendingInvitation && $invitationEvent==='account.admin.invitation_retry_started'
-            && in_array($role,['FOUNDER','DEVELOPER'],true)){
+            && ($role==='DEVELOPER')){
             $html.='<form method="post" action="/admin/users/'.$targetId.'/recover-invitation" class="setup-form">'
                 .Session::csrfField().'<p>前回の招待配送結果が不明です。SMTP記録・監査履歴・本人への案内を別経路で照合したうえで、既存の未使用リンクをすべて失効させ、再送準備のみ行います。自動有効化は行いません。</p>'
                 .'<label>運営確認番号<input name="evidence_ref" required minlength="8" maxlength="64" pattern="[A-Z0-9][A-Z0-9_-]{7,63}"></label>'
@@ -312,7 +312,7 @@ final class AdminUsersController {
      */
     public static function prepareUncertainInvitationRetry(PDO $db,int $actorId,string $actorRole,int $userId,
         string $expectedRole,string $expectedEmail,string $evidenceRef,bool $acknowledged):void {
-        if(!$acknowledged||!in_array($actorRole,['FOUNDER','DEVELOPER'],true)
+        if(!$acknowledged||!($actorRole==='DEVELOPER')
             ||!preg_match('/\A[A-Z0-9][A-Z0-9_-]{7,63}\z/D',$evidenceRef)
             ||$actorId<1||$userId<1||!filter_var($expectedEmail,FILTER_VALIDATE_EMAIL)
             ||!self::mayChange($actorRole,$actorId,$expectedRole,$userId)){

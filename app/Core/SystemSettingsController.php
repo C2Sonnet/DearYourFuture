@@ -12,7 +12,7 @@ final class SystemSettingsController {
         $role=(string)$user['role'];
         if(in_array($path,['/admin/system/mail','/admin/system/mail/templates','/admin/system/maps'],true)&&!Rbac::canTechnicalSettings($role)) {self::message('権限がありません',403);return;}
         if($path==='/admin/site/message-blocking'&&$role!=='DEVELOPER'){self::message('権限がありません',403);return;}
-        if(in_array($path,['/admin/site/gate','/admin/site/countdown'],true)&&!in_array($role,['FOUNDER','DEVELOPER'],true)){self::message('権限がありません',403);return;}
+        if(in_array($path,['/admin/site/gate','/admin/site/countdown'],true)&&!($role==='DEVELOPER')){self::message('権限がありません',403);return;}
         if($method==='POST'){
             if(!Session::validCsrf((string)($_POST['csrf']??''))){self::message('CSRF認証が必要です',403);return;}
             if((int)($_SESSION['authenticated_at']??0)<time()-900){header('Location: /admin/login',true,303);return;}
@@ -40,12 +40,15 @@ final class SystemSettingsController {
             ['/admin/messages','メッセージ管理','配信メタデータと運用管理'],
             ['/admin/messages/reports','通報審査','本文は必要な理由と監査を伴う別操作'],
             ['/admin/messages/broadcasts','システム一斉通知','下書き・キュー・配信状況'],
+            ['/admin/messages/weekly-report','週報設定','曜日・時刻・頻度・本文テンプレート'],
             ['/admin/site/access-policy','未ログイン閲覧','許可された公開ページの範囲'],
         ];
-        if(in_array($role,['FOUNDER','DEVELOPER'],true))$links[]=['/admin/site/countdown','公開前カウントダウン','未ログイン閲覧制限・終了日時・ON/OFFを管理'];
-        if(in_array($role,['FOUNDER','DEVELOPER'],true))$links[]=['/admin/site/gate','サイト共通パスワード','一般ユーザーのログインとは別の保護'];
+        if(($role==='DEVELOPER'))$links[]=['/admin/site/countdown','公開前カウントダウン','未ログイン閲覧制限・終了日時・ON/OFFを管理'];
+        if(($role==='DEVELOPER'))$links[]=['/admin/site/gate','サイト共通パスワード','一般ユーザーのログインとは別の保護'];
         if($role==='DEVELOPER')$links[]=['/admin/site/message-blocking','ブロック機能の許可','一般会員へのブロック機能の開放を管理'];
         if(Rbac::canTechnicalSettings($role)){
+            $links[]=['/admin/developer/kimi','「キミへ」の閲覧設定','対象指定と既読リセット'];
+            $links[]=['/admin/developer/activity','ユーザーの就職活動情報','本人の活動データの管理'];
             $links[]=['/admin/system/mail','SMTP技術設定','開発者専用・暗号化保存、送信テスト'];
             $links[]=['/admin/system/maps','Googleマップ設定','APIキーとピン表示の設定'];
             $links[]=['/admin/system/mail/templates','発信メールテンプレート','4種類の初期テンプレートと本文を管理'];

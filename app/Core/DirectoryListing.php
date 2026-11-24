@@ -44,11 +44,11 @@
          $work=$kind==='companies'?ResearchR07::address($company):ResearchR07::firstValue($record['worksite']??null);
          if(isset($f['q'])&&mb_stripos($name.' '.$companyName.' '.(string)$work,$f['q'])===false)return false;
          if(isset($f['region'])&&($work===null||mb_stripos($work,$f['region'])===false))return false;
-         if(!ResearchRecommendation::matches($db,$kind,$record,$f))return false;
-         $jobs=$kind==='companies'?ResearchR07::companyJobs((string)($record['company_id']??'')):[$record];
+         
+         $jobs=$kind==='companies'?ResearchClassification::companyJobs((string)($record['company_id']??'')):[$record];
          $criteria=array_intersect_key($f,array_flip(['category','recruitment_state','employment_type','salary_min','salary_max','selection_rounds','hub','commute_max']));
-         if($criteria===[])return true;
-         foreach($jobs as $job)if(self::matchJob($job,$criteria))return true;
+         if($criteria===[]&&ResearchRecommendation::requestedFilters($f)===[]&&!isset($f['role_class'])&&!isset($f['application_class']))return true;
+         foreach($jobs as $job)if(self::matchJob($job,$criteria)&&ResearchClassification::matches($job,$f)&&ResearchRecommendation::matches($db,'jobs',$job,$f))return true;
          return false;
      }
      private static function matchJob(array $job,array $f):bool {

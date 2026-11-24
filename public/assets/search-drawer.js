@@ -1,0 +1,12 @@
+(() => { 'use strict';
+ if(location.pathname.startsWith('/admin'))return;
+ const forms=[...document.querySelectorAll('main form[method="get"]')].filter(f=>f.matches('.directory-filters,.map-filter,.message-search,.compare-picker,[role="search"]'));
+ if(!forms.length)return;
+ const box=document.createElement('aside'), button=document.createElement('button'), panel=document.createElement('div');
+ box.className='search-float';box.setAttribute('aria-label','検索条件');button.type='button';button.className='btn primary search-float-toggle';button.textContent='検索条件';panel.id='search-float-panel';panel.className='search-float-panel';button.setAttribute('aria-controls',panel.id);panel.hidden=true;button.setAttribute('aria-expanded','false');
+ const close=()=>{panel.hidden=true;button.setAttribute('aria-expanded','false');};
+ button.addEventListener('click',()=>{panel.hidden=!panel.hidden;button.setAttribute('aria-expanded',String(!panel.hidden));});
+ box.addEventListener('keydown',e=>{if(e.key==='Escape'){close();button.focus();}});
+ forms.forEach((form,i)=>{form.addEventListener('submit',close);if(forms.length>1){const heading=document.createElement('h3');heading.textContent=form.classList.contains('compare-picker')?'比較対象を選ぶ':('検索条件 '+(i+1));panel.append(heading);}const parent=form.closest('.compare-drawer');panel.append(form);if(parent&&!parent.querySelector('form'))parent.hidden=true;});
+ box.append(button,panel);document.body.append(box);
+})();

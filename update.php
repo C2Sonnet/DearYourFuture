@@ -15,8 +15,10 @@
  * shadow migration with restoration of all user-owned tables is supplied. A dump is NOT
  * proof of safe recreation. This tool retains the previous database and only commits
  * explicitly authorized transactional DML after making a consistent SQL backup.
- * This updater deliberately REFUSES DDL and schema transitions: MySQL DDL is not
- * transactional. Only explicitly declared DML migrations run within one transaction.
+ * A DDL operation in a signed migration is permitted only under a restricted,
+ * checked schema plan. MySQL DDL implicitly commits, so it requires a verified
+ * full database backup and post-failure RESTORE; partial recovery retains maintenance.
+ * DML executes inside a separate transaction after all DDL operations.
  * Fail-closed behavior and a full sealed DB/files backup are preferable to pretending
  * that a non-transactional migration can be rolled back. If a crash or restoration
  * fails, an UPDATING lock is retained for administrator-assisted recovery.
@@ -56,6 +58,12 @@ final class KmmCliUpdater
     private array $oldHashes = [];
     private array $actions = ['add'=>[], 'update'=>[], 'delete'=>[], 'keep'=>[]];
     private array $sql = [];
+    private array $schemaSql = [];
+    private int $oldSchema = 0;
+    private bool $schemaChanged = false;
+    private array $applicationsBefore = [];
+    private ?array $oldCatalogue = null;
+    private ?array $newCatalogue = null;
     private string $version = '';
     private string $previous = '';
     private int $schema = 0;
@@ -85,16 +93,16 @@ final class KmmCliUpdater
     private function parse(array $argv): array
     {
         $o = ['plan'=>false, 'apply'=>false, 'confirm'=>false, 'confirm-deletes'=>false,
-              'help'=>false, 'selftest'=>false, 'db-compare'=>false, 'confirm-unmanaged-docs'=>false];
+              'help'=>false, 'selftest'=>false, 'db-compare'=>false, 'confirm-unmanaged-docs'=>false,'operator-apply'=>false,'offline-confirm'=>false];
         foreach (array_slice($argv, 1) as $arg) {
             if (!str_starts_with($arg, '--')) self::refuse('CLI options only; use --help');
             $parts = explode('=', substr($arg, 2), 2);
             $name = $parts[0];
-            if (!in_array($name, ['zip','sha256','signature','pubkey','plan','apply','confirm','confirm-deletes','confirm-unmanaged-docs','db-compare','help','selftest'], true)) {
+            if (!in_array($name, ['zip','sha256','signature','pubkey','upgrade','plan','apply','confirm','confirm-deletes','confirm-unmanaged-docs','db-compare','help','selftest','operator-apply','offline-confirm'], true)) {
                 self::refuse('Unknown option: ' . $name);
             }
             if (array_key_exists($name, $o) && !is_bool($o[$name])) self::refuse('Duplicate option: ' . $name);
-            if (in_array($name, ['plan','apply','confirm','confirm-deletes','confirm-unmanaged-docs','db-compare','help','selftest'], true)) {
+            if (in_array($name, ['plan','apply','confirm','confirm-deletes','confirm-unmanaged-docs','db-compare','help','selftest','operator-apply','offline-confirm'], true)) {
                 if (count($parts) !== 1 || $o[$name] === true) self::refuse('Invalid flag: ' . $name);
                 $o[$name] = true;
             } else {
@@ -102,6 +110,13 @@ final class KmmCliUpdater
                 $o[$name] = $parts[1];
             }
         }
+        if(isset($o['upgrade'])){
+            if(isset($o['zip']) || $o['plan'] || $o['apply'] || isset($o['signature']) || isset($o['pubkey']))self::refuse('--upgrade cannot be mixed with manual archive/signature/apply flags');
+            $name=$o['upgrade'];$o['zip']=$name;$o['apply']=true;$o['confirm']=true;
+            $o['signature']=$name.'.sig';
+            $o['pubkey']='storage/private/release_public_key.hex';
+        }
+        if($o['operator-apply'] && (!$o['apply'] || !$o['offline-confirm'] || !isset($o['sha256']) || isset($o['upgrade']) || isset($o['signature']) || isset($o['pubkey'])))self::refuse('Local operator apply requires --apply --confirm --operator-apply --offline-confirm and trusted SHA256; no signed flags');
         if ($o['apply'] && $o['plan']) self::refuse('Choose either --plan or --apply');
         return $o;
     }
@@ -110,12 +125,14 @@ final class KmmCliUpdater
         if ($this->opts['help']) { self::say($this->usage()); return 0; }
         if ($this->opts['selftest']) return $this->selftest();
         if (!$this->opts['plan'] && !$this->opts['apply']) self::refuse('Select --plan or --apply');
-        if (!isset($this->opts['zip'], $this->opts['sha256'])) self::refuse('Both --zip and trusted --sha256 are required');
+        if (!isset($this->opts['zip']) || (!isset($this->opts['sha256']) && !isset($this->opts['upgrade']))) self::refuse('ZIP and trusted SHA256 are required (or signed --upgrade=ZIP)');
         if (!extension_loaded('zip')) self::refuse('PHP ZipArchive extension is required');
         $zipPath = $this->rootZip((string)$this->opts['zip']);
-        $checksum = strtolower((string)$this->opts['sha256']);
-        if (!preg_match('/\A[a-f0-9]{64}\z/', $checksum)) self::refuse('SHA256 must have 64 hexadecimal characters');
-        if (!hash_equals($checksum, hash_file('sha256', $zipPath))) self::refuse('Archive SHA256 mismatch');
+        $checksum = isset($this->opts['sha256'])?strtolower((string)$this->opts['sha256']):null;
+        if($checksum!==null){
+            if (!preg_match('/\A[a-f0-9]{64}\z/', $checksum)) self::refuse('SHA256 must have 64 hexadecimal characters');
+            if (!hash_equals($checksum, (string)hash_file('sha256', $zipPath))) self::refuse('Archive SHA256 mismatch');
+        }
         $this->lastStage = 'archive_validation';
         $this->readArchive($zipPath);
         $this->validateExisting(false);
@@ -124,18 +141,35 @@ final class KmmCliUpdater
         if ($this->opts['db-compare']) { $this->validateExisting(true); $this->printDatabaseComparison(); }
         if ($this->opts['plan']) { self::say('PLAN ONLY: no change to filesystem or database.'); return 0; }
         if (!$this->opts['confirm']) self::refuse('Apply requires --apply --confirm');
-        if ($this->actions['delete'] !== [] && !$this->opts['confirm-deletes']) {
+        if ($this->actions['delete'] !== [] && !$this->opts['confirm-deletes'] && !isset($this->opts['upgrade'])) {
             self::refuse('Deletion planned; pass --confirm-deletes only after reviewing --plan');
         }
-        if (($this->manifest['deployment_allowed'] ?? null) !== true) self::refuse('Release manifest does not authorize deployment');
-        if (!isset($this->opts['signature'], $this->opts['pubkey'])) self::refuse('Detached Ed25519 signature and pinned public key are mandatory for apply');
-        $this->verifySignature($zipPath);
+        if(isset($this->opts['upgrade'])){
+            $this->verifySignature($zipPath);
+            // A single invocation is permitted; destructive files require a real interactive approval.
+            if($this->actions['delete']!==[] || $this->schemaSql!==[]){
+                if(!defined('STDIN') || !function_exists('stream_isatty') || !stream_isatty(STDIN))self::refuse('Destructive change requires interactive TTY approval');
+                self::say('ATTENTION: this release changes/deletes managed files or changes the DB schema. Type exactly: '.$this->version);
+                $answer=fgets(STDIN);
+                if(!is_string($answer) || trim($answer)!==$this->version)self::refuse('Interactive approval not granted');
+            }
+        }
+        if($this->opts['operator-apply']){
+            if(($this->manifest['operator_apply_allowed']??false)!==true || $this->version!=='2.6.1' || $this->previous!=='2.6.0' || $this->schema!==41 || $this->oldSchema!==41 || $this->sql!==[] || $this->schemaSql!==[] || ($this->manifest['variant']??'')!=='Private_Deployment')self::refuse('Local operator path restricted to v2.6.1 private same-schema package; no migration SQL');
+            self::say('LOCAL OPERATOR AUTHORIZATION: SHA256 checked; offline/drained service confirmed by operator; not a signed or externally tested release.');
+        }else{
+            if (($this->manifest['deployment_allowed'] ?? null) !== true) self::refuse('Release manifest does not authorize deployment');
+            if (!isset($this->opts['signature'], $this->opts['pubkey'])) self::refuse('Detached Ed25519 signature and pinned public key are mandatory for apply');
+            if(!isset($this->opts['upgrade']))$this->verifySignature($zipPath);
+        }
         $lockPath=$this->root.'/storage/system/updater-cli.guard';
         if (is_link($lockPath)) self::refuse('Updater guard symlink forbidden');
         $guard=fopen($lockPath,'c');
         if (!is_resource($guard) || !flock($guard,LOCK_EX|LOCK_NB)) self::refuse('Another update is already running');
         try {
             $this->validateExisting(true);
+            $this->actions=['add'=>[],'update'=>[],'delete'=>[],'keep'=>[]];$this->buildPlan();
+            if($this->actions['delete']!==[]&&!$this->opts['confirm-deletes']&&!isset($this->opts['upgrade']))self::refuse('Deletion requires explicit approval');
             $this->ensureRequirements();
             $this->apply();
         } finally {flock($guard,LOCK_UN);fclose($guard);}
@@ -145,10 +179,12 @@ final class KmmCliUpdater
     private function usage(): string
     {
         return "KMM CLI Updater (place update.php in the parent directory of public/)\n"
+         . "  php update.php --upgrade=SIGNED_RELEASE.zip  # pinned key + ZIP.sig must already exist\n"
          . "  php update.php --zip=RELEASE.zip --sha256=TRUSTED_SHA256 --plan [--db-compare]\n"
          . "  php update.php --zip=RELEASE.zip --sha256=TRUSTED_SHA256 --signature=RELEASE.sig --pubkey=storage/private/release_public_key.hex --apply --confirm [--confirm-deletes] [--confirm-unmanaged-docs]\n"
+         . "  php update.php --zip=PRIVATE_2.6.1.zip --sha256=TRUSTED_SHA256 --apply --confirm --confirm-deletes --operator-apply --offline-confirm\n"
          . "  php update.php --selftest\n"
-         . "Note: only signed, deployment-authorized same-schema releases and transactional DML can be applied.\n";
+         . "Note: signed channel requires deployment authorization. v2.6.1 private same-schema ZIP also supports explicit local operator approval of trusted SHA256 after service drain; no external-test claim. Failed/ambiguous commit keeps maintenance.\n";
     }
     private function rootZip(string $name): string
     {
@@ -167,10 +203,10 @@ final class KmmCliUpdater
         foreach (explode('/', $name) as $part) {
             if ($part === '' || $part === '.' || $part === '..' || str_contains($part, ':') || preg_match('/[\x00-\x1f]/', $part)) return false;
         }
-        if ($name === 'public/.user.ini' || $name === '.env' || str_starts_with($name, 'storage/') || str_starts_with($name, '.git/') || preg_match('/(^|\/)\.env(\.|$)/', $name)) return false;
+        if ($name === 'public/.user.ini' || $name === '.env' || str_starts_with($name, 'storage/') || str_starts_with($name, '.git/') || ($name !== '.env.example' && preg_match('/(^|\/)\.env(\.|$)/', $name))) return false;
         if (str_starts_with($name, 'resources/private/') && $name !== 'resources/private/kimi-letter-20261123.md' && !str_starts_with($name, 'resources/private/waterfall/')) return false;
         $roots = ['app/','public/','database/','resources/','tools/','docs/','deploy/','waterfall/'];
-        $singles = ['VERSION','README.md','INSTALL.md','INSTALL_NEW.md','SECURITY.md','CHANGELOG.md','LICENSE','VERSIONING.md','composer.json','.gitignore','.env.example','release-manifest.json','robots.txt'];
+        $singles = ['update.php','VERSION','README.md','INSTALL.md','INSTALL_NEW.md','SECURITY.md','CHANGELOG.md','LICENSE','VERSIONING.md','composer.json','.gitignore','.env.example','release-manifest.json','robots.txt'];
         return in_array($name, $singles, true) || str_starts_with($name, 'waterfall/') || array_any($roots, static fn($p) => str_starts_with($name,$p));
     }
     private static function neverDelete(string $name): bool
@@ -244,7 +280,7 @@ final class KmmCliUpdater
         if (!is_array($list) || !array_is_list($list) || count($list)>24) self::refuse('Invalid SQL migrations list');
         $seen=[];
         foreach ($list as $entry) {
-            if (!is_array($entry) || ($entry['type']??null)!=='transactional_dml') self::refuse('Only explicit transactional_dml SQL updates are allowed');
+            if (!is_array($entry) || !in_array($entry['type']??null,['transactional_dml','schema_ddl'],true)) self::refuse('Unsupported SQL migration type');
             $path=$entry['path']??null; $sha=$entry['sha256']??null;
             if (!is_string($path) || !preg_match('~\Adatabase/migrations/releases/[A-Za-z0-9._-]+\.sql\z~',$path) || !is_string($sha) || !isset($this->newHashes[$path]) || !hash_equals($this->newHashes[$path],$sha)) {
                 self::refuse('SQL update must be inside the verified archive and match its hash');
@@ -253,7 +289,11 @@ final class KmmCliUpdater
             $seen[$path]=true;
             $raw=$this->zip?->getFromName($path);
             if (!is_string($raw) || strlen($raw)>self::SQL_LIMIT) self::refuse('SQL migration oversized/unreadable');
-            foreach (self::parseTransactionalSql($raw) as $sql) $this->sql[]=['file'=>$path,'statement'=>$sql];
+            if($entry['type']==='schema_ddl'){
+                foreach(self::parseSchemaSql($raw) as $sql)$this->schemaSql[]=['file'=>$path]+$sql;
+            }else{
+                foreach(self::parseTransactionalSql($raw) as $sql)$this->sql[]=['file'=>$path,'statement'=>$sql];
+            }
         }
     }
     /** Deliberately rejects comments, DDL, stored procedures, implicit commits and multi-statements. */
@@ -285,9 +325,112 @@ final class KmmCliUpdater
         if (count($out)>256) self::refuse('Too many SQL statements');
         return $out;
     }
+    /** Restrictive schema migration grammar; no stored routines, cross-database targets, or hidden SQL. */
+    public static function parseSchemaSql(string $raw):array {
+        if(str_contains($raw,"\0") || preg_match('//u',$raw)!==1 ||
+           preg_match('~--|/\*|\*/|#|\\|\\|;\s*;|\b(?:FOREIGN_KEY_CHECKS|GRANT|REVOKE|TRUNCATE|RENAME|DEFINER|DELIMITER|TRIGGER|PROCEDURE|FUNCTION|EVENT|DATABASE|SCHEMA|USE|LOAD|OUTFILE|INFILE|LOCK|UNLOCK|COMMIT|ROLLBACK|BEGIN|START)\b~i',$raw))self::refuse('Unsafe schema migration content');
+        $segments=[];$buf='';$quote='';$escape=false;
+        for($i=0,$n=strlen($raw);$i<$n;$i++){
+            $c=$raw[$i];
+            if($quote!==''){
+                $buf.=$c;
+                if($escape){$escape=false;continue;}
+                if($c==='\\'){$escape=true;continue;}
+                if($c===$quote){if($i+1<$n&&$raw[$i+1]===$quote)$buf.=$raw[++$i];else $quote='';}
+                continue;
+            }
+            if($c==='\''||$c==='"'||$c==='`'){$quote=$c;$buf.=$c;continue;}
+            if($c===';'){if(trim($buf)!=='')$segments[]=trim($buf);$buf='';continue;}
+            $buf.=$c;
+        }
+        if($quote!=='')self::refuse('Unterminated schema SQL literal');
+        if(trim($buf)!=='')$segments[]=trim($buf);
+        if(!$segments || count($segments)>24)self::refuse('Schema migration statement count invalid');
+        $result=[];
+        foreach($segments as $sql){
+            $flat=preg_replace('/\s+/u',' ',$sql);
+            $verb='';$table='';
+            if(preg_match('/\ACREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?`?([A-Za-z][A-Za-z0-9_]{0,63})`?\s*\(/i',$flat,$m)){
+                $verb='create';$table=$m[1];
+                if(!preg_match('/\bENGINE\s*=\s*InnoDB\b/i',$flat))self::refuse('New tables must explicitly use InnoDB');
+            }elseif(preg_match('/\AALTER\s+TABLE\s+`?([A-Za-z][A-Za-z0-9_]{0,63})`?\s+ADD\s+(?:COLUMN\s+)?`?[A-Za-z][A-Za-z0-9_]{0,63}`?\s+/i',$flat,$m)){
+                $verb='add_column';$table=$m[1];
+            }elseif(preg_match('/\AALTER\s+TABLE\s+`?([A-Za-z][A-Za-z0-9_]{0,63})`?\s+(?:MODIFY|DROP)\s+(?:COLUMN\s+)?`?[A-Za-z][A-Za-z0-9_]{0,63}`?(?:\s+|$)/i',$flat,$m)){
+                $verb='destructive_alter';$table=$m[1];
+            }elseif(preg_match('/\ADROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?`?([A-Za-z][A-Za-z0-9_]{0,63})`?\s*\z/i',$flat,$m)){
+                $verb='drop';$table=$m[1];
+            }else self::refuse('Schema migration operation is not on the approved CREATE/ALTER/DROP TABLE list');
+            if(!preg_match('/\A[A-Za-z][A-Za-z0-9_]{0,63}\z/D',$table))self::refuse('Invalid table identifier');
+            if(preg_match('/\b(?:DROP\s+DATABASE|REFERENCES\s+`?[^`\s()]+\.|INSERT\s+INTO|DELETE\s+FROM|UPDATE\s+|SELECT\s+|AS\s+SELECT|LIKE\s+|DATA\s+DIRECTORY|INDEX\s+DIRECTORY)\b/i',$flat))self::refuse('Unsupported schema action');
+            // ALTER ADD/MODIFY/DROP may contain only ONE column operation. The
+            // extra comma action, including MODIFY ... , DROP ..., is forbidden.
+            if($verb==='add_column'||$verb==='destructive_alter'){
+                if(preg_match('/\b(?:ADD|MODIFY|DROP|CHANGE|RENAME|ALGORITHM|LOCK)\b/i',substr($flat,strlen($m[0]))))
+                    self::refuse('Compound column alterations are not supported');
+            }
+            $result[]=['statement'=>$sql,'operation'=>$verb,'table'=>$table];
+        }
+        return $result;
+    }
+    /** Database preflight for explicit migration. Destructive schema changes only on EMPTY unreferenced tables. */
+    private function checkSchemaOperations():void {
+        if(!$this->schemaSql)return;
+        if($this->schema<=$this->oldSchema)self::refuse('Schema DDL requires an incremented schema_version');
+        $protected=['installation_state','users','user_roles','roles','application_tracks','application_events','application_audit',
+            'messages','message_recipients','audit_logs','auth_tokens','user_profiles','seed_entity_states','seed_entity_overlays','system_settings'];
+        foreach($this->schemaSql as $step){
+            $table=$step['table'];$op=$step['operation'];
+            $stmt=$this->pdo?->prepare('SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?');
+            $stmt?->execute([$table]);$engine=$stmt?->fetchColumn();
+            if($op==='create'){
+                if($engine!==false)self::refuse('Schema CREATE target already exists: '.$table);
+                continue;
+            }
+            if($engine===false||strcasecmp((string)$engine,'InnoDB')!==0)self::refuse('Schema modification target missing or not InnoDB: '.$table);
+            if(in_array($op,['drop','destructive_alter'],true)){
+                if(in_array($table,$protected,true))self::refuse('Protected table cannot be destructively altered: '.$table);
+                $rows=(int)$this->pdo?->query('SELECT COUNT(*) FROM `'.$table.'`')->fetchColumn();
+                if($rows!==0)self::refuse('Destructive schema migration requires an empty table: '.$table);
+                $fk=$this->pdo?->prepare('SELECT COUNT(*) FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA=DATABASE() AND REFERENCED_TABLE_NAME=?');
+                $fk?->execute([$table]);
+                if((int)$fk?->fetchColumn()!==0)self::refuse('Referenced table cannot be removed/altered: '.$table);
+            }
+        }
+    }
+    /**
+     * Restrict automatic DML to single-table row operations. A signed package is
+     * necessary, but signing alone must not authorize JOIN-based writes to user data.
+     * UPDATE/DELETE without WHERE and INSERT ... SELECT are deliberately unsupported.
+     */
     private static function assertDml(string $sql): string
     {
-        if(!preg_match('/\A(?:INSERT\s+INTO|REPLACE\s+INTO|UPDATE\s+|DELETE\s+FROM)\b/i',$sql)) self::refuse('Only INSERT/REPLACE/UPDATE/DELETE are allowed');
+        $flat=trim(preg_replace('/\s+/u',' ',$sql)??$sql);
+        if (preg_match('/\b(?:SELECT|JOIN|USING|UNION|WITH|RECURSIVE|INFORMATION_SCHEMA|PERFORMANCE_SCHEMA|LOAD_FILE|OUTFILE|INFILE|SLEEP|BENCHMARK|FOREIGN_KEY_CHECKS|SQL_SAFE_UPDATES|TRIGGER|PROCEDURE|FUNCTION)\b/i',$flat)
+            || str_contains($flat,'@')) self::refuse('Complex or cross-table DML is not supported');
+        if (preg_match('/\AINSERT\s+INTO\s+`?([A-Za-z][A-Za-z0-9_]{0,63})`?\s*(?:\([^;]*?\)\s*)?VALUES\s*\(/i',$flat,$m)) {
+            $op='insert';
+        } elseif (preg_match('/\AUPDATE\s+`?([A-Za-z][A-Za-z0-9_]{0,63})`?\s+SET\s+.+\s+WHERE\s+.+\z/is',$flat,$m)) {
+            $op='update';
+        } elseif (preg_match('/\ADELETE\s+FROM\s+`?([A-Za-z][A-Za-z0-9_]{0,63})`?\s+WHERE\s+.+\z/is',$flat,$m)) {
+            $op='delete';
+        } else self::refuse('Only single-table INSERT VALUES, UPDATE ... WHERE or DELETE ... WHERE are allowed');
+        $table=strtolower($m[1]);
+        $permitted=['companies','jobs','brands','sources','company_locations','job_locations','company_sources','business_change_events','project_seed_records'];
+        if(!in_array($table,$permitted,true) && !str_starts_with($table,'research_'))
+            self::refuse('User-owned/security table is excluded from release DML');
+        if($op==='delete' && in_array($table,['companies','jobs'],true))
+            self::refuse('Hard deletion of companies/jobs is forbidden: archive instead');
+        if($op==='insert' && preg_match('/\bON\s+DUPLICATE\s+KEY\s+UPDATE\s+(.+)\z/is',$flat,$onDuplicate)){
+            if(preg_match('/(?:\A|,)\s*`?(?:id|company_id|job_id|seed_key)`?\s*=/i',$onDuplicate[1]))
+                self::refuse('Immutable identity may not be changed by INSERT duplicate handling');
+        }
+        if($op==='update') {
+            // Stable object identities/ownership may not be reassigned by a migration.
+            $set=trim((string)preg_replace('/\AUPDATE\s+`?[A-Za-z][A-Za-z0-9_]{0,63}`?\s+SET\s+/i','',$flat));
+            $set=preg_split('/\s+WHERE\s+/i',$set,2)[0]??'';
+            if(preg_match('/(?:\A|,)\s*`?(?:id|company_id|job_id|seed_key)`?\s*=/i',$set))
+                self::refuse('Immutable identity may not be changed by automatic migration');
+        }
         return $sql;
     }
     private function verifySignature(string $zipPath): void
@@ -307,7 +450,7 @@ final class KmmCliUpdater
         if (!is_string($key)||strlen($key)!==SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES || !is_string($sig)||strlen($sig)!==SODIUM_CRYPTO_SIGN_BYTES) self::refuse('Invalid Ed25519 signature/key length');
         $manifest=$this->zip?->getFromName('release-manifest.json');
         if (!is_string($manifest) || !sodium_crypto_sign_verify_detached($sig,$manifest,$key)) self::refuse('Release signature validation failed');
-        if (array_diff(array_keys($this->newHashes),array_keys($this->manifest['files']))!==[]) {
+        if (array_diff(array_keys($this->newHashes),array_keys($this->manifest['files']),['release-manifest.json'])!==[]) {
             self::refuse('All ZIP files must be covered by signed release-manifest files');
         }
         if (($this->manifest['signature_status']??'UNSIGNED')==='UNSIGNED') self::refuse('Manifest is explicitly marked unsigned');
@@ -344,13 +487,14 @@ final class KmmCliUpdater
             if (($this->installLock[$f]??null)!==($this->updateLock[$f]??null)) self::refuse('Install/update locks disagree');
         }
         $this->previous=(string)($this->installLock['version']??'');
+        $this->oldSchema=(int)($this->installLock['schema']??0);
         $oldVersion=trim((string)file_get_contents($this->root.'/VERSION'));
-        if ($oldVersion!==$this->previous || version_compare($this->version,$this->previous,'<=') || !is_int($this->installLock['schema']??null) || $this->schema!==$this->installLock['schema']) {
+        if ($oldVersion!==$this->previous || version_compare($this->version,$this->previous,'<=') || !is_int($this->installLock['schema']??null) || $this->schema<$this->oldSchema || ($this->schema!==$this->oldSchema && $this->schemaSql===[])) {
             self::refuse('Version ordering or schema compatibility failure (no downgrade/reinstall/schema DDL)');
         }
         $oldPath=$this->root.'/release-manifest.json';
         $old=json_decode((string)@file_get_contents($oldPath),true,256,JSON_THROW_ON_ERROR);
-        if (!is_array($old) || ($old['version']??null)!==$this->previous || ($old['schema_version']??null)!==$this->schema || !is_array($old['files']??null)) self::refuse('Installed manifest mismatch');
+        if (!is_array($old) || ($old['version']??null)!==$this->previous || ($old['schema_version']??null)!==$this->oldSchema || !is_array($old['files']??null)) self::refuse('Installed manifest mismatch');
         $this->oldHashes=[];
         foreach ($old['files'] as $path=>$h) {
             if (!is_string($path) || !self::safePath($path) || !is_string($h) || !preg_match('/\A[a-f0-9]{64}\z/',$h)) self::refuse('Invalid installed manifest entry');
@@ -371,7 +515,7 @@ final class KmmCliUpdater
             PDO::ATTR_TIMEOUT=>5,
         ]);
         $q=$this->pdo->query('SELECT install_id, schema_version, status, release_version FROM installation_state WHERE id=1')->fetch();
-        if (!is_array($q) || $q['install_id']!==($this->installLock['install_id']??null) || (int)$q['schema_version']!==$this->schema || $q['status']!=='installed' || $q['release_version']!==$this->previous) self::refuse('DB installation_state differs from signed installation locks');
+        if (!is_array($q) || $q['install_id']!==($this->installLock['install_id']??null) || (int)$q['schema_version']!==$this->oldSchema || $q['status']!=='installed' || $q['release_version']!==$this->previous) self::refuse('DB installation_state differs from signed installation locks');
         $dev=(int)$this->pdo->query("SELECT COUNT(*) FROM users u JOIN user_roles r ON r.user_id=u.id WHERE u.status='active' AND r.role_code='DEVELOPER'")->fetchColumn();
         if ($dev<1) self::refuse('No active DEVELOPER account in DB');
     }
@@ -440,7 +584,7 @@ final class KmmCliUpdater
     {
         $this->newHashes['release-manifest.json']=hash('sha256',(string)$this->zip?->getFromName('release-manifest.json'));
         foreach ($this->newHashes as $path=>$digest) {
-            if ($path==='update.php') continue;
+            // update.php is itself a managed site-root file; staged replacement is atomic.
             $where=$this->root.'/'.$path;
             $this->checkTarget($path);
             if (is_file($where) && !is_link($where) && hash_equals((string)hash_file('sha256',$where),$digest)) $this->actions['keep'][]=$path;
@@ -460,8 +604,8 @@ final class KmmCliUpdater
         $unmanagedDocs=array_values(array_filter($this->actions['update'], fn($p)=>!isset($this->oldHashes[$p]) && self::untrackedDocumentation($p)));
         $info=['current'=>$this->previous,'target'=>$this->version,'schema'=>$this->schema,'files'=>array_map('count',$this->actions),
                'untracked_document_updates_requiring_confirmation'=>$unmanagedDocs,
-               'sql_statements'=>count($this->sql), 'deployment_allowed'=>$this->manifest['deployment_allowed']??false,
-               'manifest_coverage'=>count($this->newHashes)-1===count($this->manifest['files'])];
+               'sql_statements'=>count($this->sql),'schema_statements'=>count($this->schemaSql), 'deployment_allowed'=>$this->manifest['deployment_allowed']??false,
+               'operator_apply_allowed'=>$this->manifest['operator_apply_allowed']??false, 'manifest_coverage'=>count($this->newHashes)-1===count($this->manifest['files'])];
         self::say(json_encode($info,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR));
         foreach (['add','update','delete'] as $kind) {
             foreach ($this->actions[$kind] as $path) self::say(strtoupper($kind).' '.$path);
@@ -483,6 +627,17 @@ final class KmmCliUpdater
     }
     private function ensureRequirements(): void
     {
+        if($this->opts['operator-apply']){
+            if(!extension_loaded('mbstring'))self::refuse('mbstring is required for R07 synchronization');
+            foreach(['storage','storage/private','storage/system','storage/private/app.key','storage/private/database.json','install.lock','update.lock'] as $p)if(is_link($this->root.'/'.$p))self::refuse('Linked private path forbidden: '.$p);
+            if(function_exists('posix_geteuid') && fileowner($this->root.'/update.lock')!==posix_geteuid())self::refuse('Run as the existing lock owner / site PHP account, not root');
+            if($this->binary('tar')===null)self::refuse('tar required for full protected site snapshot');
+            $bad=$this->pdo?->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_TYPE='BASE TABLE' AND ENGINE<>'InnoDB'")->fetchColumn();
+            if((int)$bad!==0)self::refuse('Non-InnoDB tables prevent transactional update');
+            $triggers=$this->pdo?->query("SELECT COUNT(*) FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE()")->fetchColumn();
+            if((int)$triggers!==0)self::refuse('Database triggers require separate review before local apply');
+            foreach(['install','update'] as $name)if($this->existingLockFile($name)!==$this->root.'/'.$name.'.lock')self::refuse('Local apply requires root install/update locks');
+        }
         if (!function_exists('proc_open') || !is_callable('proc_open')) self::refuse('Process launch is unavailable');
         foreach (['mysqldump','mysql'] as $binary) {
             if ($this->binary($binary)===null) self::refuse($binary.' is required for sealed DB backup/recovery');
@@ -490,7 +645,7 @@ final class KmmCliUpdater
         if (!is_writable($this->root) || !is_writable($this->root.'/storage/system')) self::refuse('Site/system directory not writable');
         foreach (array_merge($this->actions['update'],$this->actions['delete']) as $path) {
             if (isset($this->oldHashes[$path]) && !hash_equals($this->oldHashes[$path],(string)hash_file('sha256',$this->root.'/'.$path))) self::refuse('Local managed file changed unexpectedly: '.$path);
-            if (!isset($this->oldHashes[$path])) {
+            if (!isset($this->oldHashes[$path]) && $path!=='release-manifest.json') {
                 if (!self::untrackedDocumentation($path) || !$this->opts['confirm-unmanaged-docs']) self::refuse('Unmanaged file would be overwritten: '.$path.' (document-only override: --confirm-unmanaged-docs)');
             }
         }
@@ -510,7 +665,7 @@ final class KmmCliUpdater
     {
         foreach (explode(PATH_SEPARATOR,(string)getenv('PATH')) as $dir) {
             if ($dir==='')continue;$candidate=rtrim($dir,'/').'/'.$name;
-            if (is_file($candidate) && is_executable($candidate) && !is_link($candidate)) return $candidate;
+            if(!str_starts_with($dir,'/'))continue; $real=realpath($candidate);if(is_string($real)&&is_file($real)&&is_executable($real))return $real;
         }
         return null;
     }
@@ -527,6 +682,19 @@ final class KmmCliUpdater
         chmod($temp,$mode);
         if (!rename($temp,$file)) { @unlink($temp); self::refuse('Atomic file replace failed'); }
     }
+    private function privateDataDigest():array {
+        $tables=['users','user_roles','user_profiles','user_guide_steps','user_saved_filters','user_favorite_companies','user_company_notes','messages','message_recipients','edit_proposals','application_tracks','application_audit','audit_logs','companies','jobs','system_settings','application_events'];
+        $result=[];
+        foreach($tables as $table){
+            $columns=$this->pdo->query('SHOW COLUMNS FROM `'.$table.'`')->fetchAll(PDO::FETCH_ASSOC);
+            $pk=[];foreach($columns as $column)if($column['Key']==='PRI')$pk[]='`'.str_replace('`','``',$column['Field']).'`';
+            if(!$pk)self::refuse('Protected table lacks primary key: '.$table);
+            $q=$this->pdo->query('SELECT * FROM `'.$table.'` ORDER BY '.implode(',',$pk));$ctx=hash_init('sha256');$count=0;
+            while($row=$q->fetch(PDO::FETCH_ASSOC)){hash_update($ctx,serialize($row)."\n");$count++;}
+            $q->closeCursor();$result[$table]=['rows'=>$count,'sha256'=>hash_final($ctx)];
+        }
+        return $result;
+    }
     private function apply(): void
     {
         $this->lastStage='begin_backup';
@@ -540,6 +708,14 @@ final class KmmCliUpdater
         file_put_contents($this->backupRoot.'/update.lock.original',$oldUpdate,LOCK_EX);
         chmod($this->backupRoot.'/install.lock.original',0600); chmod($this->backupRoot.'/update.lock.original',0600);
         try {
+            if($this->opts['operator-apply']){
+                $this->lastStage='full_site_backup';
+                $tar=$this->backupRoot.'/site.before.tar.gz';
+                $this->subprocess([$this->binary('tar'),'--exclude=./storage/backups','--exclude=./'.basename((string)$this->opts['zip']),'-czf',$tar,'-C',$this->root,'.'],[0=>['file','/dev/null','r'],1=>['file','/dev/null','w'],2=>['pipe','w']]);
+                chmod($tar,0600);
+                $this->subprocess([$this->binary('tar'),'-tzf',$tar],[0=>['file','/dev/null','r'],1=>['file','/dev/null','w'],2=>['pipe','w']]);
+                self::atomic($this->backupRoot.'/site.before.sha256',hash_file('sha256',$tar)."\n",0600);
+            }
             // Maintenance barrier BEFORE snapshot: all web writes must stop.
             $this->saveLock('update',array_replace($this->updateLock,['phase'=>'UPDATING','started_utc'=>gmdate('c')]));
             $this->lockChanged=true;
@@ -549,6 +725,19 @@ final class KmmCliUpdater
             $dbSha=(string)hash_file('sha256',$this->dbDump);
             $this->saveLock('update',array_replace($this->updateLock,['phase'=>'UPDATING','backup_sha256'=>$dbSha,
               'backup_basename'=>basename($this->backupRoot),'started_utc'=>gmdate('c')]));
+            $this->lastStage='preflight_schema';
+            $this->checkSchemaOperations();
+            // Capture the previous approved research JSON before replacing site files.
+            foreach(glob($this->root.'/resources/research/r07-current/COMPANY_JOB_RELATIONS_*.json')?:[] as $candidate){
+                if(!is_file($candidate)||is_link($candidate))continue;
+                $oldData=json_decode((string)file_get_contents($candidate),true,128);
+                if(is_array($oldData)){$this->oldCatalogue=$oldData;break;}
+            }
+            $spec=$this->manifest['catalogue_sync']??null;
+            if(is_array($spec)&&is_string($spec['path']??null)){
+                $newData=$this->zip?->getFromName($spec['path']);
+                if(is_string($newData)){$value=json_decode($newData,true,128);if(is_array($value))$this->newCatalogue=$value;}
+            }
             $this->lastStage='stage_and_file_backup';
             $this->stageAndCopyOriginals();
             $this->lastStage='lint_staged_php';
@@ -557,30 +746,47 @@ final class KmmCliUpdater
             $this->applyFiles();
             $this->lastStage='verify_deployed_files';
             $this->verifyAppliedFiles();
+            $this->lastStage='apply_schema';
+            foreach($this->schemaSql as $step){
+                // Even a failed DDL may have committed: activate snapshot restoration first.
+                $this->schemaChanged=true;
+                try{$this->pdo?->exec($step['statement']);}
+                catch(Throwable $e){throw new KmmCliUpdateException('Schema migration failed at '.$step['file'].' '.$step['operation'].' '.$step['table'],0,$e);}
+            }
             $this->lastStage='apply_sql';
             $this->pdo?->beginTransaction();$this->dbTransaction=true;
-            $this->syncSignedResearchSnapshot();
-            foreach ($this->sql as $idx=>$migration) {
-                try {$this->pdo?->exec($migration['statement']);}
-                catch (Throwable $e) {throw new KmmCliUpdateException('SQL migration failed at statement '.($idx+1).' from '.$migration['file'].'; SQLSTATE='.($e instanceof PDOException?$e->getCode():'unknown'),0,$e);}
-            }
-            $q=$this->pdo?->prepare('UPDATE installation_state SET release_version=? WHERE id=1 AND install_id=? AND schema_version=? AND release_version=? AND status=?');
-            $q?->execute([$this->version,$this->installLock['install_id'],$this->schema,$this->previous,'installed']);
+            // All user application IDs and selection states are captured under row locks.
+            require_once $this->root.'/app/autoload.php';
+            $this->applicationsBefore=\KMM\Core\ApplicationUpdateNotice::capture($this->pdo);
+            $privateBefore=$this->opts['operator-apply']?$this->privateDataDigest():null;
+            // Chart-only release: exact same research snapshot and zero migrations.
+            // No catalogue sync, weekly journal or application notifications on this patch.
+            if($this->version!=='2.6.1'||$this->previous!=='2.6.0'||$this->sql!==[]||$this->schemaSql!==[]||!is_array($this->oldCatalogue)||!is_array($this->newCatalogue)||$this->oldCatalogue!==$this->newCatalogue)self::refuse('Chart-only patch requires unchanged Batch66 catalogue and no migrations');
+            self::say('Chart-only patch: catalogue, weekly-report state and application notifications unchanged.');
+            $q=$this->pdo?->prepare('UPDATE installation_state SET release_version=?,schema_version=? WHERE id=1 AND install_id=? AND schema_version=? AND release_version=? AND status=?');
+            $q?->execute([$this->version,$this->schema,$this->installLock['install_id'],$this->oldSchema,$this->previous,'installed']);
             if ($q?->rowCount() !== 1) self::refuse('DB release_version update did not affect exactly one installed row');
+            if($privateBefore!==null){
+                $privateAfter=$this->privateDataDigest();
+                if($privateAfter!==$privateBefore)self::refuse('Protected user table contents changed; update rolled back');
+                self::atomic($this->backupRoot.'/protected-data-verification.json',json_encode(['result'=>'PASS','tables'=>$privateAfter],JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR),0600);
+                self::say('Protected user data verified: '.count($privateAfter).' tables unchanged.');
+            }
             $this->lastStage='commit_database';
             // Ambiguous COMMIT cannot be called rolled-back without restoring the sealed SQL backup.
             $this->dbCommitAttempted=true;
             if (!$this->pdo?->commit()) self::refuse('DB transaction commit failed');
             $this->dbTransaction=false;$this->dbCommitted=true;
             $this->lastStage='finalize_locks';
-            $install=$this->installLock;$install['version']=$this->version;
-            $update=$this->updateLock;$update['version']=$this->version;
+            $install=$this->installLock;$install['version']=$this->version;$install['schema']=$this->schema;
+            $update=$this->updateLock;$update['version']=$this->version;$update['schema']=$this->schema;
             $this->saveLock('install',$install);
-            $this->saveLock('update',$update);
             $this->lastStage='final_verify';
-            if ($this->readLock('install')['version']!==$this->version || $this->readLock('update')['version']!==$this->version) self::refuse('Final lock verification failed');
+            if ($this->readLock('install')['version']!==$this->version) self::refuse('Final install lock verification failed');
             $q=$this->pdo?->query('SELECT release_version FROM installation_state WHERE id=1');
             if ($q?->fetchColumn()!==$this->version) self::refuse('Final DB release version mismatch');
+            $this->saveLock('update',$update);
+            if($this->readLock('update')['version']!==$this->version)self::refuse('Final update lock verification failed');
             $this->saveReceipt('completed', 'files_and_transactional_sql_committed');
         } catch (Throwable $e) {
             $failedAt=$this->lastStage;
@@ -590,14 +796,24 @@ final class KmmCliUpdater
                 try {$this->saveLock('update',array_replace($this->updateLock,['phase'=>'UPDATING','rollback_pending'=>true]));}
                 catch(Throwable $re){$errors[]='Failed to re-enable maintenance: '.$re->getMessage();}
             }
+            if($this->dbTransaction && !$this->pdo?->inTransaction())$errors[]='Expected DB transaction is not active; manual verification required';
             if ($this->dbTransaction && $this->pdo?->inTransaction()) {
                 try {$this->pdo->rollBack();$this->dbTransaction=false;}catch(Throwable $re){$errors[]='PDO rollback: '.$re->getMessage();}
             }
             try {if ($this->filesChanged) $this->rollbackFiles();}catch(Throwable $re){$errors[]='File rollback: '.$re->getMessage();}
-            if ($this->dbCommitAttempted) {
-                try {$this->restoreDb();}catch(Throwable $re){$errors[]='DB snapshot restore: '.$re->getMessage();}
+            if($this->opts['operator-apply'] && ($this->dbCommitAttempted || $this->schemaChanged)){
+                $errors[]='Commit attempted or schema changed: do not automatically replace production DB; verify database.before.sql and restore under continued maintenance if required';
+            }elseif ($this->dbCommitAttempted || $this->schemaChanged) {
+                try {
+                    $this->restoreDb();
+                    // Verify restored installation tuple before unlocking the old site.
+                    $check=$this->pdo?->query('SELECT install_id,schema_version,release_version,status FROM installation_state WHERE id=1')->fetch(PDO::FETCH_ASSOC);
+                    if(!is_array($check)||$check['install_id']!==$this->installLock['install_id']||
+                       (int)$check['schema_version']!==$this->oldSchema||$check['release_version']!==$this->previous||$check['status']!=='installed')
+                        throw new KmmCliUpdateException('Restored installation_state is inconsistent');
+                }catch(Throwable $re){$errors[]='DB snapshot restore: '.$re->getMessage();}
             }
-            if ($errors===[]) {
+            if ($errors===[] && $this->lockChanged) {
                 try {
                     self::atomic($this->root.'/install.lock',$oldInstall,0600);
                     self::atomic($this->root.'/update.lock',$oldUpdate,0600);
@@ -640,7 +856,7 @@ final class KmmCliUpdater
         }
         $plan=['previous'=>$this->previous,'target'=>$this->version,'schema'=>$this->schema,
                'add'=>$this->actions['add'],'update'=>$this->actions['update'],'delete'=>$this->actions['delete'],
-               'migrations'=>count($this->sql),'original_modes'=>$this->oldModes];
+               'migrations'=>count($this->sql),'schema_operations'=>array_map(static fn($v)=>['operation'=>$v['operation'],'table'=>$v['table']],$this->schemaSql),'original_modes'=>$this->oldModes];
         self::atomic($this->backupRoot.'/plan.json',json_encode($plan,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),0600);
     }
     private function lintStagedPhp(): void
@@ -727,7 +943,7 @@ final class KmmCliUpdater
         $cnf=$this->mysqlClientConfig();
         try {
             $cfg=json_decode((string)file_get_contents($this->root.'/storage/private/database.json'),true,32,JSON_THROW_ON_ERROR);
-            $cmd=[$this->binary('mysqldump'), '--defaults-extra-file='.$cnf,'--single-transaction','--quick','--hex-blob','--routines','--triggers','--events','--add-drop-table','--no-tablespaces','--set-gtid-purged=OFF',$cfg['database']];
+            $cmd=[$this->binary('mysqldump'), '--defaults-extra-file='.$cnf,'--single-transaction','--quick','--hex-blob','--routines','--triggers','--events','--add-drop-table','--no-tablespaces',...(!str_contains(strtolower(basename((string)$this->binary('mysqldump'))),'mariadb')?['--set-gtid-purged=OFF']:[]),$cfg['database']];
             $this->subprocess($cmd,[0=>['file','/dev/null','r'],1=>['file',$this->dbDump,'w'],2=>['pipe','w']]);
             if (!is_file($this->dbDump) || filesize($this->dbDump)<100) self::refuse('Database backup absent/empty');
             chmod($this->dbDump,0600);
@@ -754,8 +970,17 @@ final class KmmCliUpdater
     private function selftest(): int
     {
         $cases=[
-          'INSERT INTO t(id) VALUES (1);' => true,
-          "UPDATE t SET v='good'; DELETE FROM t WHERE id=1;"=>true,
+          'INSERT INTO companies(id) VALUES (1);' => true,
+          "UPDATE companies SET legal_name='New' WHERE id='abc';"=>true,
+          'DELETE FROM sources WHERE id=1;'=>true,
+          'UPDATE companies SET legal_name=1;'=>false,
+          'DELETE FROM sources;'=>false,
+          'REPLACE INTO companies(id) VALUES (1);'=>false,
+          'INSERT INTO companies SELECT * FROM users;'=>false,
+          "UPDATE companies JOIN users ON users.id=1 SET users.status='disabled' WHERE companies.id=1;"=>false,
+          "INSERT INTO companies(id) VALUES (1) ON DUPLICATE KEY UPDATE id=2;"=>false,
+          "UPDATE jobs SET company_id='bad' WHERE id='abc';"=>false,
+          "UPDATE system_settings SET value_json='false' WHERE setting_key='auth.self_registration_enabled';"=>false,
           'CREATE TABLE t(id INT);'=>false,
           'ALTER TABLE t ADD COLUMN a INT;'=>false,
           'DROP TABLE t;'=>false,
@@ -768,10 +993,21 @@ final class KmmCliUpdater
             try {self::parseTransactionalSql($query);$got=true;}catch(KmmCliUpdateException){$got=false;}
             if ($got!==$valid) self::refuse('SQL selftest failed for '.substr($query,0,60).' expected='.($valid?'true':'false').' got='.($got?'true':'false'));$ok++;
         }
-        foreach (['app/Core/SiteState.php','public/index.php','docs/USER_GUIDE.md'] as $n) {
+        foreach(['CREATE TABLE release_new(id INT PRIMARY KEY) ENGINE=InnoDB;'=>true,
+                 'ALTER TABLE release_new ADD COLUMN c INT NULL;'=>true,
+                 'DROP TABLE release_new;'=>true,
+                 'TRUNCATE TABLE users;'=>false,
+                 'DROP DATABASE hello;'=>false,
+                 'ALTER TABLE users RENAME TO old_users;'=>false,
+                 'CREATE TABLE exfil(id INT) ENGINE=InnoDB AS SELECT id FROM users;'=>false,
+                 'ALTER TABLE t ADD COLUMN x INT, DROP COLUMN name;'=>false] as $sql=>$valid){
+            try{self::parseSchemaSql($sql);$got=true;}catch(KmmCliUpdateException){$got=false;}
+            if($got!==$valid)self::refuse('Schema parser selftest failed');$ok++;
+        }
+        foreach (['app/Core/SiteState.php','public/index.php','docs/USER_GUIDE.md','.env.example','public/favicon.ico'] as $n) {
             if (!self::safePath($n)) self::refuse('Path selftest failed');$ok++;
         }
-        foreach (['../storage/private/app.key','public/.user.ini','storage/private/database.json','update.php','public/../../etc/passwd','public/evil\\name'] as $n) {
+        foreach (['../storage/private/app.key','public/.user.ini','.env','public/.env.example','storage/private/database.json','public/../../etc/passwd','public/evil\\name'] as $n) {
             if (self::safePath($n)) self::refuse('Protected path selftest failed');$ok++;
         }
         self::say('SELFTEST PASS: '.$ok.' safety/SQL cases. (No ZIP, DB or filesystem changes.)');

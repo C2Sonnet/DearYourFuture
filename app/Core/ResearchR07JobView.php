@@ -127,7 +127,7 @@ final class ResearchR07JobView {
         foreach(['checked_on','verified_on','source_check_date','observed_on','published_at','date'] as $key){
             $v=$row[$key]??null;if(is_string($v)&&preg_match('/\A\d{4}-\d{2}-\d{2}\z/',$v))return $v;
         }
-        return '2026-11-23'; // dataset snapshot date, not proof of an individual recheck
+        return '2026-11-24'; // dataset snapshot date, not proof of an individual recheck
     }
     private static function batch(array $row):int {
         // Specific field provenance takes precedence over the current snapshot's wrapper label.
@@ -141,7 +141,8 @@ final class ResearchR07JobView {
         $v=trim($value);
         $v=preg_replace('/（原典値：[[:space:]]*[^）]*）/u','',$v)??$v;
         if(preg_match('/\A(?:true|false)(?:（原典値[^）]*）)?\z/i',$v))return null; // internal research flags, not user facts
-        if($v===''||in_array(mb_strtolower($v),['null','n/a','unknown','none','unreviewed'],true))return null;
+        if($v===''||in_array(mb_strtolower($v),['null','n/a','none'],true))return null;
+        if(in_array(mb_strtolower($v),['unknown','unreviewed'],true))return '不明';
         if(isset(self::STATUSES[$v]))$v=self::STATUSES[$v];
         if(preg_match('/\A[a-z][a-z0-9_]*(?:_[a-z0-9_]+)+\z/i',$v))return null; // opaque technical tokens
         if($label==='駅から徒歩'&&preg_match('/\A\d+\z/',$v))$v.='分';
@@ -199,6 +200,7 @@ final class ResearchR07JobView {
             '給与原文（R06・コース別条件に注意）'=>70];
         $winners=[];
         foreach($out as $group=>$fields)foreach($fields as $label=>$values)foreach($values as $i=>$row){
+            if(in_array($row['value'],['不明','未確定','未確認','種類不明'],true))continue;
             $distinctScope=str_contains($label,'別公式コース')||str_contains($label,'別の一般募集要項')?'別コース:'.$label:'通常';
             $fingerprint=$distinctScope.'|'.self::key($row['value']);
             $candidate=['group'=>$group,'label'=>$label,'index'=>$i,'priority'=>$preferred[$label]??100,
@@ -209,6 +211,7 @@ final class ResearchR07JobView {
         }
         foreach($out as $group=>$fields)foreach($fields as $label=>$values){
             foreach($values as $i=>$row){
+                if(in_array($row['value'],['不明','未確定','未確認','種類不明'],true))continue;
                 $scope=str_contains($label,'別公式コース')||str_contains($label,'別の一般募集要項')?'別コース:'.$label:'通常';
                 $winner=$winners[$scope.'|'.self::key($row['value'])];
                 if($winner['group']!==$group||$winner['label']!==$label||$winner['index']!==$i)unset($out[$group][$label][$i]);
@@ -227,13 +230,16 @@ final class ResearchR07JobView {
             $html.='<section class="r07-job-group"><h3>'.Security::h($group).'</h3><div class="r07-table-wrap"><table class="r07-fact-table"><tbody>';
             foreach($entries as $label=>$values){
                 if($values===[])continue;
+                $unknown=static fn($row)=>in_array($row['value'],['不明','未確定','未確認','種類不明'],true);
+                $known=array_values(array_filter($values,static fn($row)=>!$unknown($row)));
+                $mixed=count($known)>0&&count($known)<count($values);if($mixed)$values=$known;
                 $html.='<tr><th scope="row">'.Security::h($label).'</th><td><ul class="r07-job-values">';
                 foreach($values as $v)$html.='<li>'.Security::h($v['value']).(preg_match('/勤務地|配属先|住所/u',$label)?GoogleMapsLink::button($v['value']):'').'</li>';
-                $html.='</ul></td></tr>';
+                $html.='</ul>'.($mixed?'<p class="note">不明・未確定とする記録もあります。再確認が必要です。</p>':'').'</td></tr>';
             }
             $html.='</tbody></table></div></section>';
         }
-        $html.='</section>';
+        $html.='</section>'.ResearchClassification::render('jobs',$sourceId);
         return $html;
     }
 }

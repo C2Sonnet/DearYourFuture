@@ -46,6 +46,10 @@ final class Migration {
             // Source-pinned R06 companies/jobs are added atomically after the
             // preserved Seed10/legacy research corpus, before installation ready.
             InitialResearchSql::apply($db,$userId);
+            // New 2.6.0 installations physically register the current R07 records as well.
+            // Existing R06/user-owned records are never overwritten.
+            ResearchR07CanonicalSync::sync($db);
+            WeeklyReport::initialize($db,new \DateTimeImmutable('now',new \DateTimeZone('Asia/Tokyo')));
             WelcomeMessage::enqueue($db,$userId,(string)$admin['name']);
             $db->prepare('INSERT INTO installation_state(id,install_id,status,schema_version,release_version) VALUES (1,?,?,?,?)')->execute([$id,'installed',self::SCHEMA,trim((string)file_get_contents(SiteState::root().'/VERSION'))]);
             $db->prepare('INSERT INTO audit_logs(actor_id,event_type,target_type,target_key,details_json) VALUES (?,?,?,?,?)')->execute([$userId,'installation.completed','installation','1','{}']);

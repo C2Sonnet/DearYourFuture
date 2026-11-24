@@ -38,6 +38,14 @@ final class MessageData {
         return $link;
     }
     public static function kindLabel(string $kind):string {return match(self::kind($kind)){'direct'=>'会員メッセージ','system'=>'システムから','company_seed_update'=>'企業情報の更新'};}
-    public static function bodyHtml(string $body):string {return nl2br(Security::h($body),false);}
+    public static function bodyHtml(string $body,bool $system=false):string {
+        if(!$system)return nl2br(Security::h($body),false);
+        $lines=explode("\n",$body);foreach($lines as &$line){
+            if(preg_match('~\A(確認先[：:]\s*)(/[^\s]+)\s*\z~u',trim($line),$m)){
+                try{$path=self::internalLink($m[2]);if(!preg_match('~\A/(?:companies|jobs)(?:/research)?(?:/[A-Za-z0-9-]+)?\z~D',$path))throw new \InvalidArgumentException();$line=Security::h($m[1]).'<a href="'.Security::h($path).'">詳細を開く</a>';continue;}catch(\Throwable){}
+            }
+            $line=Security::h($line);
+        }unset($line);return implode("<br>\n",$lines);
+    }
     public static function badge(int $unread):string {return $unread>99?'99+':(string)max(0,$unread);}
 }

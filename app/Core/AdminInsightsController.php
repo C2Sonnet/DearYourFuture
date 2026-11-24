@@ -33,13 +33,17 @@ final class AdminInsightsController {
             $salary[$label]=($salary[$label]??0)+1;
         }
         $charts=['salary'=>['初任給の内訳（確認できた構造化データのみ）',self::pieData($salary)],'employment'=>['雇用形態',self::pieData($types)],'region'=>['企業の所在地（都道府県別）',self::pieData($pref)],'publication'=>['求人掲載情報の確認区分',self::pieData($pub)]];
-        $html='<section class="hero compact"><span class="eyebrow">ADMIN / ANALYTICS</span><h1>データ集計</h1><p>管理者向け集計。原典R07 112社・141求人と、DBの更新監査記録を分けて表示します。</p></section>';
-        $html.='<section class="section"><h2>収録データ集計</h2><div class="data-stats-cards"><article class="panel"><strong>'.count($co).'</strong><span>収録企業</span></article><article class="panel"><strong>'.count($jobs).'</strong><span>収録求人</span></article><article class="panel"><strong>'.count($charts).'</strong><span>分類別集計</span></article></div></section>';
+        
+        $summary=ResearchClassification::data()['summary'];
+        foreach(['role_classification'=>'専門技術との適合性分類（求人群）','application_classification'=>'応募確認候補の分類（求人群）','company_best_classification'=>'応募確認候補の分類（企業群）'] as $key=>$title){$items=[];foreach($summary[$key] as $label=>$n)$items[(ResearchClassification::ROLE+ResearchClassification::CANDIDATE)[$label]??'未確定']=$n;$charts[$key]=[$title,self::pieData($items)];}
+        $userCount=(int)$db->query('SELECT COUNT(*) FROM users')->fetchColumn();
+        $html='<section class="hero compact"><span class="eyebrow">ADMIN / ANALYTICS</span><h1>データ集計</h1><p>管理者向け集計。サイト採用R07データ集（件数は下の集計を参照）と、DBの更新監査記録を分けて表示します。</p></section>';
+        $html.='<section class="section"><h2>収録データ集計</h2><p>重複整理後：112企業群・145求人群（原ID保全）</p><div class="data-stats-cards"><article class="panel"><strong>'.$userCount.'</strong><span>登録ユーザー数（開発者を含む）</span></article><article class="panel"><strong>'.count($co).'</strong><span>収録企業</span></article><article class="panel"><strong>'.count($jobs).'</strong><span>収録求人</span></article><article class="panel"><strong>'.count($charts).'</strong><span>分類別集計</span></article></div></section>';
         $json=json_encode(self::lineData($db),JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_THROW_ON_ERROR);
         $html.='<section class="section"><h2>企業・求人の変更件数（日別、直近30日）</h2><p class="note">新規・修正・削除はDBの変更監査から集計します。R07研究原典の差分履歴や外部サイト更新は含みません。データがない日は0件です。</p><div class="panel stats-chart" data-admin-line="'.Security::h($json).'" aria-label="企業と求人別の日別新規・修正・削除件数"></div></section>';
         $html.='<section class="section"><h2>構成比・分布</h2><div class="admin-pie-grid">';
-        foreach($charts as $key=>$chart){$json=json_encode($chart[1],JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_THROW_ON_ERROR);$html.='<article class="panel"><h3>'.Security::h($chart[0]).'</h3><div data-admin-pie="'.Security::h($json).'" class="stats-chart" role="img" aria-label="'.Security::h($chart[0]).'"></div></article>';}
-        $html.='</div><p class="note">円グラフは各区画に4度の隙間（padAngle）を設けています。初任給は同一採用コースで数字が確認できたデータだけを計上し、未確認を分けて表示します。</p></section><script src="/assets/admin-statistics.js" defer></script>';
+        foreach($charts as $key=>$chart){$json=json_encode($chart[1],JSON_UNESCAPED_UNICODE|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_HEX_AMP|JSON_THROW_ON_ERROR);$html.='<article class="panel"><h3>'.Security::h($chart[0]).'</h3><div data-admin-pie="'.Security::h($json).'" class="stats-chart" role="group" aria-label="'.Security::h($chart[0]).'"></div></article>';}
+        $html.='</div><p class="note">円グラフは各区画に最大4度の隙間を設けています。初任給は同一採用コースで数字が確認できたデータだけを計上し、未確認を分けて表示します。</p></section>';
         Kernel::layout('データ集計',$html);
     }
 }

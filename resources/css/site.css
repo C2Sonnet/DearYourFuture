@@ -666,3 +666,57 @@ html.kimi-modal-open{overflow:hidden}
 .application-card .app-status-form{display:grid;grid-template-columns:minmax(0,1fr);width:100%;gap:.5rem}
 .application-card .app-status-form label{min-width:0;width:100%}
 .application-card .app-status-form button[type=submit]{justify-self:start;margin:0;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+
+/* Release-owned notices. UIkit uk-alert semantics with an offline-safe fallback. */
+.uk-alert[uk-alert] { display:block; padding:.85rem 1rem; margin:.65rem 0; border:1px solid rgba(84,112,129,.22); border-radius:12px; background:rgba(235,244,249,.9); color:inherit; line-height:1.7; overflow-wrap:anywhere; }
+.uk-alert[uk-alert] strong {display:block; margin-bottom:.25rem;}
+.uk-alert[uk-alert] p {margin:.25rem 0 0;}
+.uk-alert-warning[uk-alert] {background:rgba(255,243,214,.94); border-color:rgba(159,119,48,.36); color:#624b25;}
+.uk-alert-primary[uk-alert] {background:rgba(225,241,253,.94); border-color:rgba(74,137,168,.34); color:#30536b;}
+@media (prefers-color-scheme:dark) {.uk-alert-warning[uk-alert]{background:rgba(90,64,27,.78);color:#fff0d5}.uk-alert-primary[uk-alert]{background:rgba(31,61,78,.86);color:#d6f1ff}}
+
+/* CSP-safe dynamic header height quantized to CSS classes; no inline styles. */
+html.kmm-header-h-32{--kmm-header-height:32px}
+html.kmm-header-h-48{--kmm-header-height:48px}
+html.kmm-header-h-64{--kmm-header-height:64px}
+html.kmm-header-h-80{--kmm-header-height:80px}
+html.kmm-header-h-96{--kmm-header-height:96px}
+html.kmm-header-h-112{--kmm-header-height:112px}
+html.kmm-header-h-128{--kmm-header-height:128px}
+html.kmm-header-h-144{--kmm-header-height:144px}
+html.kmm-header-h-160{--kmm-header-height:160px}
+html.kmm-header-h-176{--kmm-header-height:176px}
+html.kmm-header-h-192{--kmm-header-height:192px}
+html.kmm-header-h-208{--kmm-header-height:208px}
+html.kmm-header-h-224{--kmm-header-height:224px}
+html.kmm-header-h-240{--kmm-header-height:240px}
+html.kmm-header-h-256{--kmm-header-height:256px}
+html.kmm-header-h-272{--kmm-header-height:272px}
+html.kmm-header-h-288{--kmm-header-height:288px}
+html.kmm-header-h-304{--kmm-header-height:304px}
+html.kmm-header-h-320{--kmm-header-height:320px}
+html.kmm-header-h-336{--kmm-header-height:336px}
+html.kmm-header-h-352{--kmm-header-height:352px}
+html.kmm-header-h-368{--kmm-header-height:368px}
+html.kmm-header-h-384{--kmm-header-height:384px}
+html.kmm-header-h-400{--kmm-header-height:400px}
+html.kmm-header-h-416{--kmm-header-height:416px}
+html.kmm-header-h-432{--kmm-header-height:432px}
+html.kmm-header-h-448{--kmm-header-height:448px}
+html.kmm-header-h-464{--kmm-header-height:464px}
+html.kmm-header-h-480{--kmm-header-height:480px}
+html.kmm-header-h-496{--kmm-header-height:496px}
+html.kmm-header-h-512{--kmm-header-height:512px}
+
+.search-commute-note{flex-basis:100%}
+
+.privacy-main{max-width:800px;margin:3rem auto;padding:1.5rem}
+
+.login-notice-dismiss-form{margin:0;padding:0;display:contents}.login-notice-dismiss{z-index:2;pointer-events:auto}.login-notices{z-index:1001}
+
+/* v2.6.0 accessible floating search */
+.search-float{position:fixed;left:0.5rem;top:42%;z-index:65;display:flex;align-items:flex-start;gap:.4rem;max-width:calc(100vw - 1rem)}
+.search-float + .search-float{top:51%}.search-float-toggle{writing-mode:vertical-rl;min-height:6rem;white-space:nowrap}.search-float-panel{background:var(--surface,#fff);color:var(--ink,#222);padding:1rem;border:1px solid var(--line,#999);border-radius:12px;max-height:65vh;overflow:auto;width:min(420px,calc(100vw - 5rem));box-shadow:0 5px 25px #0003}.search-float-panel[hidden]{display:none!important}.search-float-panel form{display:flex;flex-direction:column;gap:.7rem;margin:0}.search-float-panel fieldset{min-width:0;display:flex;flex-direction:column;gap:.5rem;padding:.6rem;border:1px solid #999;border-radius:8px}.search-float-panel label{display:flex;flex-direction:column;gap:.25rem}.search-float-panel label:has(input[type=checkbox]){flex-direction:row;align-items:center}.search-float-panel input,.search-float-panel select{max-width:100%}.search-float-panel input[type=checkbox]{width:auto;min-height:0;flex:none}.search-float-panel .directory-filters label{min-width:0;max-width:none;flex:none}.search-float-panel .directory-filters{align-items:stretch}.search-float-panel .directory-filters fieldset{width:100%}.search-float-toggle{padding:.65rem .45rem;margin:0;min-width:2.5rem}.search-float{transform:translateY(-30%)}@media(max-width:600px){.search-float{top:35%;left:.2rem}.search-float-panel{max-height:60vh;width:calc(100vw - 4rem);padding:.6rem}}
+
+/* v2.6.1: chart details use external CSS only (strict CSP). */
+.interactive-pie{display:block;width:min(100%,240px)!important;height:auto;margin-inline:auto}.interactive-line{display:block;width:100%;height:auto}.chart-slice,.chart-day-hit{cursor:pointer}.chart-slice.chart-active,.chart-slice:focus-visible{filter:brightness(1.15);outline:2px solid currentColor;outline-offset:2px}.chart-day-hit{fill:transparent;pointer-events:all}.chart-day-hit.chart-active,.chart-day-hit:focus-visible{fill:currentColor;fill-opacity:.08;outline:none}.chart-detail{min-height:3.6em;display:flex;flex-wrap:wrap;gap:.3rem .85rem;align-content:center;padding:.6rem .8rem;border:1px solid var(--line);border-radius:.6rem;margin:.4rem 0;background:var(--surface);font-size:.9rem;overflow-wrap:anywhere}.chart-detail strong{flex-basis:100%}.interactive-chart-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:.3rem .6rem;list-style:none;padding:0;margin:.5rem 0;width:100%;font-size:.84rem}.chart-legend-button,.chart-line-key{display:inline-flex;align-items:center;gap:.35rem;max-width:100%;text-align:left;white-space:normal;overflow-wrap:anywhere}.chart-legend-button{color:inherit;background:transparent;border:1px solid transparent;border-radius:.3rem;padding:.2rem .35rem;cursor:pointer;font:inherit}.chart-legend-button.chart-active,.chart-legend-button:focus-visible{border-color:var(--primary);background:var(--surface)}.interactive-chart-legend svg{width:12px!important;height:12px!important;flex:none}.r07-chart-grid .r07-chart{display:block}.stats-chart .interactive-pie{max-height:none}

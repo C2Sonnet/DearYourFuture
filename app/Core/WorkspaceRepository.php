@@ -42,6 +42,7 @@ final class WorkspaceRepository {
             if($raw[$key]!=='1')throw new \InvalidArgumentException('Invalid R07 directory filter');
             $out[$key]='1';
         }
+        foreach(ResearchClassification::options() as $key=>$allowed){$v=$raw[$key]??'';if(!is_string($v)||($v!==''&&!isset($allowed[$v])))throw new \InvalidArgumentException('Invalid classification');if($v!=='')$out[$key]=$v;}
         if(isset($out['salary_min'],$out['salary_max']) && (int)$out['salary_min']>(int)$out['salary_max'])throw new \InvalidArgumentException('Invalid salary range');
         return $out;
     }

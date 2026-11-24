@@ -9,11 +9,13 @@ final class AdminController {
             http_response_code(403);Kernel::layout('アクセス権がありません','<section class="hero compact"><h1>アクセス権がありません</h1></section>',false);return;
         }
         $db=Database::connected();
-        if(FounderPrivacyController::isRoute($path)){FounderPrivacyController::handle($db,$path,$method,$user);return;}
+        if(DeveloperPrivacyController::isRoute($path)){DeveloperPrivacyController::handle($db,$path,$method,$user);return;}
+        if($path===RegistrationSettingsController::PATH){RegistrationSettingsController::handle($db,$method,$user);return;}
+        if($path===WeeklyReportController::PATH){WeeklyReportController::handle($db,$method,$user);return;}
         if(WelcomeSettingsController::isRoute($path)){WelcomeSettingsController::handle($db,$path,$method,$user);return;}
         if($path===LoginNoticeSettingsController::PATH){LoginNoticeSettingsController::handle($db,$method,$user);return;}
         if(AdminInsightsController::isRoute($path)){AdminInsightsController::handle($db,$path,$method);return;}
-        if(AdminDevelopmentController::isRoute($path)){AdminDevelopmentController::handle($path,$method);return;}
+        if(AdminDevelopmentController::isRoute($path)){AdminDevelopmentController::handle($path,$method,$user);return;}
         if(AdminSeedController::promptIfDue($db,(int)$user['id'],$path,$method))return;
         if($path===AdminExternalLinksController::PATH){AdminExternalLinksController::handle($method,$user);return;}
         if($path===AdminResearchPublicationController::PATH){AdminResearchPublicationController::handle($method,$user);return;}

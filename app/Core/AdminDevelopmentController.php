@@ -14,7 +14,8 @@ final class AdminDevelopmentController {
         'maintenance'=>['保守','保守マニュアル','2026-11-21','キミの未来へ_保守_保守マニュアル.pdf'],
     ];
     public static function isRoute(string $path):bool{return $path==='/admin/development'||preg_match('~\A/admin/development/pdf/[a-z0-9-]+\z~D',$path)===1;}
-    public static function handle(string $path,string $method):void {
+    public static function handle(string $path,string $method,array $actor):void {
+        if(($actor['role']??null)!=='DEVELOPER'){http_response_code(403);return;}
         if($method!=='GET'){header('Allow: GET');http_response_code(405);return;}
         if(str_starts_with($path,'/admin/development/pdf/')){
             $slug=substr($path,strlen('/admin/development/pdf/'));

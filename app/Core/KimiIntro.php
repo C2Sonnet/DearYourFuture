@@ -13,10 +13,10 @@ final class KimiIntro {
         $role=(string)($user['role']??'');
         $handle=(string)($user['handle']??'');
         try {
-            $choice=FounderPrivacyController::override(Database::connected(),(int)($user['id']??0));
+            $choice=DeveloperPrivacyController::override(Database::connected(),(int)($user['id']??0));
             if($choice!==null)return $choice;
         }catch(\Throwable){return false;}
-        return (Rbac::RANK[$role]??0)>=Rbac::RANK['FOUNDER'] || strcasecmp($handle,'mina')===0;
+        return $role==='DEVELOPER' || strcasecmp($handle,'mina')===0;
     }
     public static function acknowledged(PDO $db,int $userId): bool {
         if($userId<1)throw new \InvalidArgumentException('Invalid user');

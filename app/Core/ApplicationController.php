@@ -73,7 +73,7 @@ final class ApplicationController {
         $html.='</div>';
         if($path==='/my')$html.=WorkspaceController::panel($db,$uid);
         if(!$tracks)$html.='<p class="note">まだ記録がありません。気になる企業を見つけたら、検討リストに追加してみましょう。 <a href="/companies">企業を探す</a></p>';
-        else {$html.='<div class="compact-card-grid application-card-grid">';foreach($tracks as $row){$html.=self::trackCard($row,true);}$html.='</div>';}
+        else {$notices=ApplicationUpdateNotice::forUser($db,$uid,$tracks);$html.='<div class="compact-card-grid application-card-grid">';foreach($tracks as $row){$html.=self::trackCard($row,true,$notices[$row['id']]??null);}$html.='</div>';}
         if($page>1)$html.='<a href="'.$path.'?page='.($page-1).'">前へ</a> ';
         if(count($tracks)===25)$html.='<a href="'.$path.'?page='.($page+1).'">次へ</a>';
         self::view($title,$html);
@@ -90,12 +90,13 @@ final class ApplicationController {
         $html.=ViewHistory::gallery($db,$uid);
         self::view('ユーザーセンター',$html);
     }
-    private static function trackCard(array $row,bool $withForm=false):string {
+    private static function trackCard(array $row,bool $withForm=false,?array $notice=null):string {
         $status=ApplicationData::status($row['status']);
         $html='<article class="application-card '.ApplicationData::css($status).'">';
         if($status==='accepted')$html.='<div class="celebration-art" aria-hidden="true"><img src="/assets/celebration.svg" alt=""></div>';
         $html.='<div class="eyebrow">'.Security::h(ApplicationData::LABELS[$status]).'</div><h2><a href="/companies/'.Security::h($row['company_id']).'">'.Security::h($row['company_name']).'</a></h2>';
         if($row['job_title']!==null)$html.='<p>応募求人：'.Security::h($row['job_title']).'</p>';
+        $html.=ApplicationUpdateNotice::alert($row,$notice);
         $html.='<p>'.Security::h(ApplicationData::message($status)).'</p><p><a href="/companies/'.Security::h($row['company_id']).'/timeline">企業別タイムライン →</a></p>';
         if($withForm)$html.=self::statusForm($row['company_id'],$row['job_id'],$row);
         return $html.'</article>';
@@ -114,6 +115,8 @@ final class ApplicationController {
         $tracks=$companyId!==null?ApplicationRepository::companyTracks($db,$uid,$companyId):ApplicationRepository::tracks($db,$uid,null,100);
         $title=$calendar?'応募カレンダー':($companyId!==null?'企業別タイムライン':'全企業タイムライン');
         $html=self::head($title,'日付が未定の予定は未確定として別に表示。手動記録と公式募集情報を混同しません。').self::nav();
+        $notices=ApplicationUpdateNotice::forUser($db,$uid,$tracks);
+        foreach($tracks as $track)$html.=ApplicationUpdateNotice::alert($track,$notices[$track['id']]??null);
         if($calendar)$html.=self::calendarGrid($events,$month);
         if($companyId!==null&&$tracks===[])$html.='<p class="note">この企業はまだ検討リストにありません。<a href="/companies/'.$companyId.'">企業詳細に戻る</a></p>';
         if(!$events)$html.='<p class="note">まだ予定・出来事の記録はありません。まずは企業を検討リストへ追加しましょう。</p>';

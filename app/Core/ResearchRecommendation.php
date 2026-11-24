@@ -220,9 +220,9 @@ final class ResearchRecommendation {
         foreach(['employment'=>'求人形態','prefectures'=>'企業場所（都道府県別）'] as $type=>$label){
             $data=[];foreach($counts[$type] as $name=>$value)$data[]=['name'=>(string)$name,'value'=>$value];
             $json=json_encode($data,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR);
-            $html.='<article class="r07-chart-panel panel"><h3>'.Security::h($label).'</h3><div class="r07-chart" data-r07-chart="'.Security::h($type).'" aria-label="'.Security::h($label).'の内訳グラフ"></div><script type="application/json" id="r07-chart-'.Security::h($type).'">'.$json.'</script></article>';
+            $html.='<article class="r07-chart-panel panel"><h3>'.Security::h($label).'</h3><div class="r07-chart" data-r07-chart="'.Security::h($type).'" aria-label="'.Security::h($label).'の内訳グラフ" data-chart-values="'.Security::h($json).'"></div></article>';
         }
-        $html.='</div><script src="https://cdn.jsdelivr.net/npm/echarts@6.1.0/dist/echarts.min.js" defer></script><script src="/assets/r07-charts.js" defer></script></section>';
+        $html.='</div></section>';
         $labels=[];foreach(self::GROUPS as $group=>$values)foreach($values as $key=>$value)$labels[$key]=$value;
         $current=[];foreach($criteria as $key=>$enabled)if($enabled&&isset($labels[$key]))$current[]=$labels[$key];
         $html.='<section class="section" id="recommend-conditions"><h2>おすすめ条件</h2><p>条件に一致する数が多い求人・企業から表示します。確認されていない項目は一致として数えません。既に応募・お気に入り登録している企業と募集終了が判明した求人は除外します。</p>';

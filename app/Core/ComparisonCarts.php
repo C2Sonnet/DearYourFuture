@@ -38,11 +38,14 @@ final class ComparisonCarts {
                 '採用年度'=>fn($x)=>ResearchR07::firstValue($x['recruitment_year']??null),
                 '給与原文'=>fn($x)=>ResearchR07::firstValue($x['recheck_r07']['salary_components']??null),
             ];
+            $fields['専門技術との適合性分類']=static fn($x)=>ResearchClassification::pairs($kind,(string)($x[$kind==='companies'?'company_id':'job_id']??''))[$kind==='companies'?'専門技術との適合性分類（収録求人）':'専門技術との適合性分類']??null;
+            foreach(['応募確認候補の分類','応募分類の理由','掲載月額（参考）','年間休日（日）','勤務時間','固定残業時間','固定残業代','待遇の注意点','個別応募資格'] as $label){$fields[$label]=static fn($x)=>ResearchClassification::pairs($kind,(string)($x[$kind==='companies'?'company_id':'job_id']??''))[$label]??null;}
             $html.='<div class="compare-scroll" role="region" tabindex="0" aria-label="比較表"><table class="compare-table"><thead><tr><th scope="col">比較項目</th>';
             foreach($selected as $id=>$row)$html.='<th scope="col">'.Security::h($kind==='companies'?ResearchR07::displayName($row):ResearchR07::jobTitle($row)).'</th>';
             $html.='</tr></thead><tbody>';
             foreach($fields as $label=>$fn){
                 $values=[];foreach($selected as $row)$values[]=(string)($fn($row)??'—');
+                if(count(array_filter($values,static fn($v)=>$v!=='—'&&trim($v)!==''))===0)continue;
                 $canonical=array_map(static fn(string $v):string=>preg_replace('/\s+/u','',trim($v))??trim($v),$values);
                 $same=count($canonical)>1 && count(array_unique($canonical))===1;
                 $html.='<tr class="'.(count($values)<2?'compare-single':($same?'compare-same':'compare-different')).'"><th scope="row">'.Security::h($label).'</th>';

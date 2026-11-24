@@ -1,1 +1,2 @@
-(()=>{'use strict';document.querySelectorAll('[data-login-notice-close]').forEach(button=>{button.addEventListener('click',()=>{button.closest('.login-notice')?.remove();});});})();
+/* Capture submit (keyboard and mouse); native POST remains functional without JS. */
+(()=>{'use strict';document.addEventListener('submit',event=>{const form=event.target;if(!(form instanceof HTMLFormElement)||!form.matches('[data-login-notice-form]'))return;const notice=form.closest('.login-notice');if(!notice)return;event.preventDefault();const wrapper=notice.closest('.login-notices');notice.remove();if(wrapper&&!wrapper.querySelector('.login-notice'))wrapper.remove();},true);})();

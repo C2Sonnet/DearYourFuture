@@ -8,7 +8,7 @@ final class ApplicationRepository {
     public static function tracks(PDO $db,int $userId,?string $status=null,int $limit=50,int $offset=0):array {
         self::user($userId);if($status!==null)ApplicationData::status($status);
         if($limit<1||$limit>100||$offset<0)throw new \InvalidArgumentException('Pagination');
-        $sql='SELECT a.*,c.display_name AS company_name,j.title AS job_title FROM application_tracks a JOIN companies c ON c.id=a.company_id LEFT JOIN jobs j ON j.id=a.job_id WHERE a.user_id=? AND a.archived_at IS NULL';
+        $sql='SELECT a.*,c.display_name AS company_name,j.title AS job_title,j.deadline_on FROM application_tracks a JOIN companies c ON c.id=a.company_id LEFT JOIN jobs j ON j.id=a.job_id WHERE a.user_id=? AND a.archived_at IS NULL';
         $args=[$userId];if($status!==null){$sql.=' AND a.status=?';$args[]=$status;}
         $sql.=' ORDER BY a.updated_at DESC,a.id LIMIT '.$limit.' OFFSET '.$offset;
         $q=$db->prepare($sql);$q->execute($args);return $q->fetchAll(PDO::FETCH_ASSOC);
@@ -21,7 +21,7 @@ final class ApplicationRepository {
     }
     public static function one(PDO $db,int $userId,string $trackId,bool $lock=false):?array {
         self::user($userId);ApplicationData::id($trackId);
-        $q=$db->prepare('SELECT a.*,c.display_name AS company_name,j.title AS job_title FROM application_tracks a JOIN companies c ON c.id=a.company_id LEFT JOIN jobs j ON j.id=a.job_id WHERE a.id=? AND a.user_id=? AND a.archived_at IS NULL'.($lock?' FOR UPDATE':''));
+        $q=$db->prepare('SELECT a.*,c.display_name AS company_name,j.title AS job_title,j.deadline_on FROM application_tracks a JOIN companies c ON c.id=a.company_id LEFT JOIN jobs j ON j.id=a.job_id WHERE a.id=? AND a.user_id=? AND a.archived_at IS NULL'.($lock?' FOR UPDATE':''));
         $q->execute([$trackId,$userId]);$a=$q->fetch(PDO::FETCH_ASSOC);return $a?:null;
     }
     /** One query for company-list cards, avoiding an N+1 database query pattern. */
@@ -38,7 +38,7 @@ final class ApplicationRepository {
     }
     public static function companyTracks(PDO $db,int $userId,string $companyId):array {
         self::user($userId);ApplicationData::id($companyId);
-        $q=$db->prepare('SELECT a.*,c.display_name AS company_name,j.title AS job_title FROM application_tracks a JOIN companies c ON c.id=a.company_id LEFT JOIN jobs j ON j.id=a.job_id WHERE a.user_id=? AND a.company_id=? AND a.archived_at IS NULL ORDER BY a.updated_at DESC');
+        $q=$db->prepare('SELECT a.*,c.display_name AS company_name,j.title AS job_title,j.deadline_on FROM application_tracks a JOIN companies c ON c.id=a.company_id LEFT JOIN jobs j ON j.id=a.job_id WHERE a.user_id=? AND a.company_id=? AND a.archived_at IS NULL ORDER BY a.updated_at DESC');
         $q->execute([$userId,$companyId]);return $q->fetchAll(PDO::FETCH_ASSOC);
     }
     public static function saveStatus(PDO $db,int $userId,string $companyId,?string $jobId,string $status,?int $expectedRevision=null):string {

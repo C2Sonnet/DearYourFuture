@@ -20,15 +20,34 @@ final class LoginNotices {
     }
 
     public static function lastLogin(PDO $db,int $userId): ?array {
-        $q=$db->prepare("SELECT created_at,details_json FROM audit_logs WHERE actor_id=? AND event_type='account.login' ORDER BY id DESC LIMIT 1");
+        $q=$db->prepare("SELECT UNIX_TIMESTAMP(created_at) AS created_epoch,details_json FROM audit_logs WHERE actor_id=? AND event_type='account.login' ORDER BY id DESC LIMIT 1");
         $q->execute([$userId]);
         $row=$q->fetch(PDO::FETCH_ASSOC);
         if(!$row)return null;
         $details=json_decode((string)$row['details_json'],true);
         if(!is_array($details))$details=[];
-        $when=$details['server_at']??$row['created_at'];
+        $when=$details['server_at']??null;
+        if(!is_string($when)||!preg_match('/(?:Z|[+-][0-9]{2}:[0-9]{2})$/D',$when)){
+            $epoch=$row['created_epoch']??null;
+            $when=is_numeric($epoch)?gmdate(DATE_ATOM,(int)$epoch):'記録なし';
+        }
         $ip=$details['ip']??null;
         return ['at'=>is_string($when)?$when:'記録なし', 'ip'=>is_string($ip)&&filter_var($ip,FILTER_VALIDATE_IP)?$ip:'記録なし'];
+    }
+
+    /** Calendar-relative formatting is explicitly Japan time, independent of host timezone. */
+    public static function formatLastLogin(string $raw,?DateTimeImmutable $now=null):string {
+        if(in_array($raw,['記録なし','初めてのログイン'],true))return $raw;
+        try {
+            if(!preg_match('/\A\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})\z/D',$raw))return '記録なし';
+            $jst=new DateTimeZone('Asia/Tokyo');
+            $past=(new DateTimeImmutable($raw))->setTimezone($jst);
+            $errors=DateTimeImmutable::getLastErrors();if(is_array($errors)&&($errors['warning_count']||$errors['error_count']))return '記録なし';
+            $today=($now??new DateTimeImmutable('now',$jst))->setTimezone($jst);
+            $date=$past->format('Y-m-d');
+            $label=$date===$today->format('Y-m-d')?'今日 '.$past->format('H:i'):($date===$today->modify('-1 day')->format('Y-m-d')?'昨日 '.$past->format('H:i'):($date===$today->modify('-2 days')->format('Y-m-d')?'一昨日 '.$past->format('H:i'):$past->format('Y/m/d H:i')));
+            return $label.'（日本時間）';
+        }catch(\Throwable){return '記録なし';}
     }
 
     public static function flashLogin(?array $last,string $ip):void {
@@ -84,7 +103,7 @@ final class LoginNotices {
         if(is_array($welcome)){
             unset($_SESSION['kmm_login_notice_flash_v1']);
             $name=Security::h((string)($user['display_name']??''));
-            $messages[]='<strong>お帰りなさい、'.$name.'さん</strong><p>前回ログイン：'.Security::h((string)($welcome['at']??'記録なし')).'</p><p>前回IP：<code>'.Security::h((string)($welcome['previous_ip']??'記録なし')).'</code></p><p>現在のIP：<code>'.Security::h((string)($welcome['current_ip']??'確認できません')).'</code></p>';
+            $messages[]='<strong>お帰りなさい、'.$name.'さん</strong><p>前回ログイン：'.Security::h(self::formatLastLogin((string)($welcome['at']??'記録なし'))).'</p><p>前回IP：<code>'.Security::h((string)($welcome['previous_ip']??'記録なし')).'</code></p><p>現在のIP：<code>'.Security::h((string)($welcome['current_ip']??'確認できません')).'</code></p>';
         }
         $now=new DateTimeImmutable('now',new DateTimeZone(date_default_timezone_get()));
         $day=$now->format('Y-m-d');
@@ -99,7 +118,7 @@ final class LoginNotices {
         if(!$messages)return '';
         $html='<aside class="login-notices" aria-label="ログインと休息の案内">';
         foreach($messages as $message){
-            $html.='<section class="login-notice" role="status">'.$message.'<button type="button" class="login-notice-dismiss" aria-label="この案内を閉じる" data-login-notice-close>×</button></section>';
+            $html.='<section class="login-notice" role="status">'.$message.'<form class="login-notice-dismiss-form" method="post" action="/account/notices/dismiss" data-login-notice-form>'.Session::csrfField().'<input type="hidden" name="next" value="'.Security::h(Session::safeReturn((string)($_SERVER['REQUEST_URI']??'/'))).'"><button type="submit" class="login-notice-dismiss" aria-label="この案内を閉じる" data-login-notice-close>×</button></form></section>';
         }
         return $html.'</aside>';
     }

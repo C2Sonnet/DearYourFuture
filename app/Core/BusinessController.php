@@ -94,6 +94,7 @@ final class BusinessController {
         foreach($locs as $loc){$head=$loc['kind']==='headquarters'?'本社':'事業拠点';$html.='<article class="panel"><h3>'.Security::h($loc['name']).'</h3><p>'.Security::h($head).' / '.Security::h($loc['address']??'住所未確認').GoogleMapsLink::button($loc['address']??null).'</p><small>所在地の検証：'.Security::h(BusinessData::verificationLabel((string)$loc['verification_state'])).'</small></article>';}
         $html.='</section>';
         if(!$locationsOnly){
+            if(Identity::current()!==null&&isset($srcId)&&$srcId!==null&&ResearchR07::company($srcId)!==null)$html.=ResearchR07::companyDetails($db,$srcId);
             $html.=ResearchSupplement::html(ResearchSupplementRepository::forCompany($db,$id));
             $html.='<section class="section"><h2>待遇・財務・沿革・口コミ（公開根拠付き）</h2>'.CompanyFacts::html(CompanyFacts::list($db,$id,true)).'</section>';
             $html.='<section class="section"><h2>求人・勤務地の確認状況</h2>';
@@ -124,7 +125,8 @@ final class BusinessController {
         if(!$locationsOnly && Identity::current()!==null){
             $private=ApplicationRepository::companyTracks($db,(int)Identity::current()['id'],$id);
             $html.='<section class="section"><h2>自分の選考状況</h2><p>記録はあなただけに表示されます。</p>';
-            foreach($private as $track)$html.='<div class="panel"><p>'.Security::h($track['job_title']??'企業全体').' / '.Security::h(ApplicationData::LABELS[$track['status']]).'</p>'.ApplicationController::statusForm($id,$track['job_id'],$track).'</div>';
+            $alerts=ApplicationUpdateNotice::forUser($db,(int)Identity::current()['id'],$private);
+            foreach($private as $track)$html.='<div class="panel"><p>'.Security::h($track['job_title']??'企業全体').' / '.Security::h(ApplicationData::LABELS[$track['status']]).'</p>'.ApplicationUpdateNotice::alert($track,$alerts[$track['id']]??null).ApplicationController::statusForm($id,$track['job_id'],$track).'</div>';
             if($private===[])$html.=ApplicationController::statusForm($id);
             $html.='</section>';
         }
@@ -177,7 +179,7 @@ final class BusinessController {
                 $html.=JobEligibility::render($r,null,$saved,true);
                 $tracks=ApplicationRepository::companyTracks($db,(int)$me['id'],(string)$r['company_id']);
                 $mine=null;foreach($tracks as $track){if(($track['job_id']??null)===$id){$mine=$track;break;}}
-                $html.='<section class="section"><h2>自分の選考状況</h2>'.ApplicationController::statusForm((string)$r['company_id'],$id,$mine).'</section>';
+                $html.='<section class="section"><h2>自分の選考状況</h2>'.($mine!==null?ApplicationUpdateNotice::alert($mine,ApplicationUpdateNotice::forUser($db,(int)$me['id'],[$mine])[$mine['id']]??null):'').ApplicationController::statusForm((string)$r['company_id'],$id,$mine).'</section>';
             }
             $liveJob=ResearchR07::job((string)($r06['source_job_id']??''));Kernel::layout($liveJob!==null?ResearchR07::jobTitle($liveJob):(string)$r['title'],EntityPageDecor::decorate($db,'jobs',$id,$html));return;
         }
@@ -188,13 +190,14 @@ final class BusinessController {
         foreach($work as $w)$html.='<p>'.Security::h($w['name']).' — '.Security::h($w['address']??'住所未確認').GoogleMapsLink::button($w['address']??null).'（'.Security::h(BusinessData::assignmentLabel((string)$w['assignment_state'])).'）</p>';
         $html.='</section>';
         if($external!=='')$html.='<section class="section"><h2>この求人の外部リンク</h2>'.$external.'</section>';
+        if(Identity::current()!==null&&isset($sourceJobId)&&$sourceJobId!==null&&ResearchR07::job($sourceJobId)!==null)$html.=ResearchR07::jobDetails($db,$sourceJobId);
         $html.=ResearchSupplement::html(ResearchSupplementRepository::forJob($db,$r['company_id'],$id));
         $html.='<a class="text-link" href="/companies/'.$r['company_id'].'">企業詳細へ →</a>';
         $me=Identity::current();if($me!==null)$html.=WorkspaceController::favoriteButton($id,in_array($id,WorkspaceRepository::favoriteKeys($db,(int)$me['id'],'jobs'),true),'/jobs/'.$id,'jobs');
         $jobSource=($r['source_id']??null)!==null?BusinessRepository::read($db,'sources',(string)$r['source_id'],true):null;
         $user=Identity::current();$saved=$user!==null?EligibilityRepository::checked($db,(int)$user['id'],$id):[];
         $html.=JobEligibility::render($r,$jobSource,$saved,$user!==null);
-        if(Identity::current()!==null){$tracks=ApplicationRepository::companyTracks($db,(int)Identity::current()['id'],$r['company_id']);$mine=null;foreach($tracks as $t){if($t['job_id']===$id){$mine=$t;break;}}$html.='<section class="section"><h2>この求人の選考状況</h2>'.ApplicationController::statusForm($r['company_id'],$id,$mine).'</section>';} 
+        if(Identity::current()!==null){$tracks=ApplicationRepository::companyTracks($db,(int)Identity::current()['id'],$r['company_id']);$mine=null;foreach($tracks as $t){if($t['job_id']===$id){$mine=$t;break;}}$html.='<section class="section"><h2>この求人の選考状況</h2>'.($mine!==null?ApplicationUpdateNotice::alert($mine,ApplicationUpdateNotice::forUser($db,(int)Identity::current()['id'],[$mine])[$mine['id']]??null):'').ApplicationController::statusForm($r['company_id'],$id,$mine).'</section>';} 
         if(Identity::current()!==null)$html.='<p><a class="text-link" href="/contributions/new?type=jobs&amp;action=update&amp;id='.$id.'">求人情報の修正を提案 →</a></p>';
         Kernel::layout((string)$r['title'],EntityPageDecor::decorate($db,'jobs',$id,$html));
     }
