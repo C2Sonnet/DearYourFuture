@@ -1,0 +1,5 @@
+# Add only to an existing correctly secured server block, verify HTTPS and document root.
+# This snippet is a guide only; it is NOT a complete nginx config.
+# root /path/to/release/public; (set in existing server block)
+location / { try_files $uri $uri/ /index.php?$query_string; }
+location ~ /\.(?!well-known) { deny all; }

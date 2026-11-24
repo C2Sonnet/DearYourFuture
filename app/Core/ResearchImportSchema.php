@@ -1,0 +1,11 @@
+<?php
+declare(strict_types=1);
+namespace KMM\Core;
+/** Schema 37: private, auditable research release staging. Does NOT publish business rows. */
+final class ResearchImportSchema {
+    public static function statements():array {return [
+        "CREATE TABLE IF NOT EXISTS research_import_batches (id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,event_key VARCHAR(100) NOT NULL UNIQUE,payload_digest CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,research_version VARCHAR(20) NOT NULL,actor_id BIGINT UNSIGNED NOT NULL,status VARCHAR(32) NOT NULL,record_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,bound_count SMALLINT UNSIGNED NOT NULL DEFAULT 0,created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT fk_research_import_actor FOREIGN KEY(actor_id) REFERENCES users(id),INDEX idx_research_import_status(status,created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        "CREATE TABLE IF NOT EXISTS research_import_items (batch_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,review_id CHAR(26) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,private_stage_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,source_record_sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,priority VARCHAR(8) NOT NULL,record_status VARCHAR(32) NOT NULL,source_record_json LONGTEXT NOT NULL,binding_json LONGTEXT NOT NULL,PRIMARY KEY(batch_id,review_id),UNIQUE KEY uniq_research_stage(batch_id,private_stage_id),CONSTRAINT fk_research_import_item_batch FOREIGN KEY(batch_id) REFERENCES research_import_batches(id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        "CREATE TABLE IF NOT EXISTS research_import_outbox (event_key VARCHAR(100) PRIMARY KEY,batch_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,event_type VARCHAR(50) NOT NULL,status VARCHAR(30) NOT NULL DEFAULT 'held',payload_digest CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,CONSTRAINT fk_research_import_outbox_batch FOREIGN KEY(batch_id) REFERENCES research_import_batches(id),INDEX idx_research_outbox_status(status,created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    ];}
+}

@@ -1,2 +1,0 @@
-<?php
-return ['site_name'=>'コード公開サイト','owner'=>'C2Sonnet','repository'=>'DearYourFuture','display_name'=>'光と影のソネット','author_ja'=>'光と影のソネット','author_url'=>'https://im.c2s.me','bio'=>'クリエイター・デザイナー・開発者','location'=>'日本・東京都','timezone'=>'Asia/Tokyo','description'=>'就職活動支援サイト','project_url'=>'https://mina.c2s.me','topics'=>['就職活動','MySQL','Nginx','PHP','ウォーターフォール型開発','仕事'],'site_url'=>'','language'=>'ja'];

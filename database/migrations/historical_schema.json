@@ -1,0 +1,486 @@
+{
+  "format": "kmm-additive-schema-history-v1",
+  "source_versions": "v0.1.1 through v0.1.9 (DDL-only, release 9 stamped without new tables)",
+  "tables": {
+    "installation_state": {
+      "introduced": 1,
+      "sha256": "ab49a5b8ad34f6f239f7ffb2353b3e018251372a22a2355a52f03cb6c29468d8"
+    },
+    "schema_migrations": {
+      "introduced": 1,
+      "sha256": "1e203cb22f3574c95e187922469a08479c9d4b28e14c4c2a511a73597a206cf6"
+    },
+    "system_settings": {
+      "introduced": 1,
+      "sha256": "bf25ca6652892df905569c4d2ed9dcf5f991ebe794e92c160598192246087b36"
+    },
+    "users": {
+      "introduced": 1,
+      "sha256": "5c73581c7aed4cacf10c4638fac6a1a580df39c30ae1437a7a2d9e0213653941"
+    },
+    "roles": {
+      "introduced": 1,
+      "sha256": "1317c82f915cb713005dc4b9e55c896667b825c795110f82914880c5f50bc80c"
+    },
+    "user_roles": {
+      "introduced": 1,
+      "sha256": "6514872e7da0a4fc95044c5af0ca1a2a9e800ad2b395ef565a6243a47a213fa8"
+    },
+    "audit_logs": {
+      "introduced": 1,
+      "sha256": "f85c5ae03992da5dddfdba3273ddf68b2503e6e44be2e87ba060f5ca08249ecf"
+    },
+    "auth_tokens": {
+      "introduced": 2,
+      "sha256": "2e2c2ca126e9de92db1a4671b891f490f60a4235566f9807ea0d55fbba986060"
+    },
+    "user_profiles": {
+      "introduced": 2,
+      "sha256": "5ae79740c5e6315c21f2dfb56627f531353b1aaefa0505db05eae5006b6295dd"
+    },
+    "mail_delivery_events": {
+      "introduced": 2,
+      "sha256": "0e1684d515a7461721a7f9e175733607bd0e75c5696ffd445a4be0bf82fae438"
+    },
+    "companies": {
+      "introduced": 3,
+      "sha256": "c6717c6c5019d8e84e711d9dad5661008b7e13995e2de4618e64de64675d4763"
+    },
+    "sources": {
+      "introduced": 3,
+      "sha256": "ffc436d14f9d8857a732bc520e665e6ad9b29bb6129e065789e9a70ec9077378"
+    },
+    "brands": {
+      "introduced": 3,
+      "sha256": "699571a01d51ff6576da8f13e76cbcff12bcc446023ff90ede9f1dfe3abe8dba"
+    },
+    "company_locations": {
+      "introduced": 3,
+      "sha256": "52fed7b4774acc92c8216de0e93380be597762ba6ddbf869a775e10dca134fa3"
+    },
+    "jobs": {
+      "introduced": 3,
+      "sha256": "38d0c865241289cc5c1b411b500c60c445bf54cc88693ea7b6a27365737a1e0b"
+    },
+    "job_locations": {
+      "introduced": 3,
+      "sha256": "0120fac5a1cb6180b5a917bacac299e164200d9b5c7ba6923e5bc966b8b1506f"
+    },
+    "company_sources": {
+      "introduced": 3,
+      "sha256": "246fb5b4b5b8e24b2ffd08b098a50695b086f1415a56efac75d375737d5ce6de"
+    },
+    "business_change_events": {
+      "introduced": 3,
+      "sha256": "d8a773e0ba20b37fa5eb2ba3e821ba47cb5361f7b1e4c17617d9b36a2fa880d1"
+    },
+    "project_seed_records": {
+      "introduced": 3,
+      "sha256": "5eb625b5737df3e8e8ff9156ecf591157482229b5d6420f6715985a6fb371893"
+    },
+    "library_documents": {
+      "introduced": 4,
+      "sha256": "68e5e09be75187645c4b9c2af8ba031389e0d1f291ba122703ed2e67e0a6c883"
+    },
+    "library_document_versions": {
+      "introduced": 4,
+      "sha256": "745801f6c0cfe85647504e462b52f53ddf84f1672436572f516314eb1e267e63"
+    },
+    "application_tracks": {
+      "introduced": 5,
+      "sha256": "66cbae2714c206d1fd15bbe6aeaf6bda2cd36bbe8bd57eb879d859cfc018dc06"
+    },
+    "application_events": {
+      "introduced": 5,
+      "sha256": "c2af690b5d3ec6d7bfcf3690d52a2c35eea2af0aa8ab052fb4ad0f09d99b0bd0"
+    },
+    "application_audit": {
+      "introduced": 5,
+      "sha256": "be0b3aa6ff2915d08595bbeb06f895fac667b50c40e88a545e88e5c4eda76470"
+    },
+    "edit_proposals": {
+      "introduced": 6,
+      "sha256": "d0b6ef64b86c2bed70a13c37e3a4a2bfff920f421b11f7bfb9286f66f9c877f6"
+    },
+    "public_change_events": {
+      "introduced": 6,
+      "sha256": "930a34cf7acc8b4198a7e1891b0ae36b20a49329cfd1428d791e50b4a0b43e39"
+    },
+    "messages": {
+      "introduced": 7,
+      "sha256": "46ac1f96f92a4f1aff6276897b654337861207589bb3ef854c0eb8e2666a2e6e"
+    },
+    "message_recipients": {
+      "introduced": 7,
+      "sha256": "9ca60ded479910d2f45f23cb35d8b1b11f9889be3401c7c4bbe3bb59edbaeb2a"
+    },
+    "message_reports": {
+      "introduced": 7,
+      "sha256": "b13a7c1f45703c9349292b3ff9c53d471e2c82cca6a169f625d59297c73bc36f"
+    },
+    "message_user_settings": {
+      "introduced": 7,
+      "sha256": "62f8cae2103d9fb7204bc34c846657fd9e85202451e0c12cace9945dd8991456"
+    },
+    "message_blocks": {
+      "introduced": 7,
+      "sha256": "6a31d052d56aa61f92e85a6698241e57a268968eae6890885a78f989e62539ef"
+    },
+    "message_broadcasts": {
+      "introduced": 7,
+      "sha256": "97b2d6f17936734d351c31b186202d1be6a8990ceb46e8300f4100cdeb2be43a"
+    },
+    "message_delivery_jobs": {
+      "introduced": 7,
+      "sha256": "65d83a338f5d7fdd6db2af84db7ab2585687275e184b92b040616e4e74c51bdc"
+    },
+    "seed_record_states": {
+      "introduced": 8,
+      "sha256": "326685170415c56d9f1c23606417a92497ba7e169bb866e20a4aa2e5b857c3b9"
+    },
+    "seed_user_overlays": {
+      "introduced": 8,
+      "sha256": "cc1842ab6e9dc3c4a9b6cc8f6492eb81c5b60d6d5aaca48a5d95d2aa3db09ceb"
+    },
+    "seed_update_batches": {
+      "introduced": 8,
+      "sha256": "d605ee90e444402ef01817f0f0ac49eb8e4145e4fcf7a9a05496e641aa929463"
+    },
+    "seed_merge_conflicts": {
+      "introduced": 8,
+      "sha256": "503c805357ecde42a6cee707f6d85dfc5e71821e3bbe1f3b98083b50d342694e"
+    },
+    "seed_batch_effects": {
+      "introduced": 8,
+      "sha256": "0afc63ccaf0f476d884d620c5d80bb78d5d78b65f1acc959e79219e4ecde5051"
+    },
+    "seed_admin_notices": {
+      "introduced": 8,
+      "sha256": "7e0f852229008e3e2f3d27f68ac63e801b8cc470c73e03797fe4020598c9a66e"
+    },
+    "history_import_batches": {
+      "introduced": 8,
+      "sha256": "09655848c56af642bf61ba3e17c5b1f3ad9cd3717e0b28c50143aa92ecb7b241"
+    },
+    "history_import_items": {
+      "introduced": 8,
+      "sha256": "848f76da41b64a676b59c4dae6aaee8f7e9cd1329c934f31a4875469a0a6cb1c"
+    }
+  },
+  "releases": {
+    "1": {
+      "table_count": 7,
+      "table_names": [
+        "audit_logs",
+        "installation_state",
+        "roles",
+        "schema_migrations",
+        "system_settings",
+        "user_roles",
+        "users"
+      ]
+    },
+    "2": {
+      "table_count": 10,
+      "table_names": [
+        "audit_logs",
+        "auth_tokens",
+        "installation_state",
+        "mail_delivery_events",
+        "roles",
+        "schema_migrations",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "3": {
+      "table_count": 19,
+      "table_names": [
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "mail_delivery_events",
+        "project_seed_records",
+        "roles",
+        "schema_migrations",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "4": {
+      "table_count": 21,
+      "table_names": [
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "library_document_versions",
+        "library_documents",
+        "mail_delivery_events",
+        "project_seed_records",
+        "roles",
+        "schema_migrations",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "5": {
+      "table_count": 24,
+      "table_names": [
+        "application_audit",
+        "application_events",
+        "application_tracks",
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "library_document_versions",
+        "library_documents",
+        "mail_delivery_events",
+        "project_seed_records",
+        "roles",
+        "schema_migrations",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "6": {
+      "table_count": 26,
+      "table_names": [
+        "application_audit",
+        "application_events",
+        "application_tracks",
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "edit_proposals",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "library_document_versions",
+        "library_documents",
+        "mail_delivery_events",
+        "project_seed_records",
+        "public_change_events",
+        "roles",
+        "schema_migrations",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "7": {
+      "table_count": 33,
+      "table_names": [
+        "application_audit",
+        "application_events",
+        "application_tracks",
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "edit_proposals",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "library_document_versions",
+        "library_documents",
+        "mail_delivery_events",
+        "message_blocks",
+        "message_broadcasts",
+        "message_delivery_jobs",
+        "message_recipients",
+        "message_reports",
+        "message_user_settings",
+        "messages",
+        "project_seed_records",
+        "public_change_events",
+        "roles",
+        "schema_migrations",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "8": {
+      "table_count": 41,
+      "table_names": [
+        "application_audit",
+        "application_events",
+        "application_tracks",
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "edit_proposals",
+        "history_import_batches",
+        "history_import_items",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "library_document_versions",
+        "library_documents",
+        "mail_delivery_events",
+        "message_blocks",
+        "message_broadcasts",
+        "message_delivery_jobs",
+        "message_recipients",
+        "message_reports",
+        "message_user_settings",
+        "messages",
+        "project_seed_records",
+        "public_change_events",
+        "roles",
+        "schema_migrations",
+        "seed_admin_notices",
+        "seed_batch_effects",
+        "seed_merge_conflicts",
+        "seed_record_states",
+        "seed_update_batches",
+        "seed_user_overlays",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "9": {
+      "table_count": 41,
+      "table_names": [
+        "application_audit",
+        "application_events",
+        "application_tracks",
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "edit_proposals",
+        "history_import_batches",
+        "history_import_items",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "library_document_versions",
+        "library_documents",
+        "mail_delivery_events",
+        "message_blocks",
+        "message_broadcasts",
+        "message_delivery_jobs",
+        "message_recipients",
+        "message_reports",
+        "message_user_settings",
+        "messages",
+        "project_seed_records",
+        "public_change_events",
+        "roles",
+        "schema_migrations",
+        "seed_admin_notices",
+        "seed_batch_effects",
+        "seed_merge_conflicts",
+        "seed_record_states",
+        "seed_update_batches",
+        "seed_user_overlays",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    },
+    "10": {
+      "table_count": 41,
+      "table_names": [
+        "application_audit",
+        "application_events",
+        "application_tracks",
+        "audit_logs",
+        "auth_tokens",
+        "brands",
+        "business_change_events",
+        "companies",
+        "company_locations",
+        "company_sources",
+        "edit_proposals",
+        "history_import_batches",
+        "history_import_items",
+        "installation_state",
+        "job_locations",
+        "jobs",
+        "library_document_versions",
+        "library_documents",
+        "mail_delivery_events",
+        "message_blocks",
+        "message_broadcasts",
+        "message_delivery_jobs",
+        "message_recipients",
+        "message_reports",
+        "message_user_settings",
+        "messages",
+        "project_seed_records",
+        "public_change_events",
+        "roles",
+        "schema_migrations",
+        "seed_admin_notices",
+        "seed_batch_effects",
+        "seed_merge_conflicts",
+        "seed_record_states",
+        "seed_update_batches",
+        "seed_user_overlays",
+        "sources",
+        "system_settings",
+        "user_profiles",
+        "user_roles",
+        "users"
+      ]
+    }
+  },
+  "scope": "Historical DDL fingerprints from the previous source ZIPs; static comparison only, not MySQL parser."
+}

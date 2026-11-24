@@ -1,0 +1,10 @@
+<?php
+declare(strict_types=1);
+namespace KMM\Core;
+/** Fresh install schema 4 only; upgrades require migration and rollback plan. */
+final class LibrarySchema {
+    public static function statements():array{return [
+        "CREATE TABLE IF NOT EXISTS library_documents (id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,company_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,source_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NULL,title VARCHAR(240) NOT NULL,description TEXT NULL,document_type VARCHAR(32) NOT NULL,publication_state VARCHAR(20) NOT NULL DEFAULT 'private',revision INT UNSIGNED NOT NULL DEFAULT 1,current_version INT UNSIGNED NOT NULL DEFAULT 1,archived_at DATETIME NULL,created_by BIGINT UNSIGNED NOT NULL,updated_by BIGINT UNSIGNED NULL,created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,INDEX idx_document_company(company_id,publication_state),INDEX idx_document_source(source_id),CONSTRAINT fk_doc_company FOREIGN KEY(company_id) REFERENCES companies(id),CONSTRAINT fk_doc_source FOREIGN KEY(source_id) REFERENCES sources(id),CONSTRAINT fk_doc_creator FOREIGN KEY(created_by) REFERENCES users(id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
+        "CREATE TABLE IF NOT EXISTS library_document_versions (document_id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,version_no INT UNSIGNED NOT NULL,storage_key CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL UNIQUE,original_name VARCHAR(240) NOT NULL,media_type VARCHAR(80) NOT NULL,byte_size INT UNSIGNED NOT NULL,scan_status VARCHAR(16) NOT NULL DEFAULT 'pending',sha256 CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,uploaded_by BIGINT UNSIGNED NOT NULL,created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,PRIMARY KEY(document_id,version_no),CONSTRAINT fk_docver_doc FOREIGN KEY(document_id) REFERENCES library_documents(id),CONSTRAINT fk_docver_user FOREIGN KEY(uploaded_by) REFERENCES users(id)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+    ];}
+}
