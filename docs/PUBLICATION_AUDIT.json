@@ -1,0 +1,68 @@
+{
+  "source": "KimiNoMirai_v2.6.1_GitHub_Source.zip",
+  "sha256": "7a848d19a2c5c34202baeda22744d169f3a6e23de5a89c2e13b1b47975e679e3",
+  "files": 325,
+  "rules": [
+    "private_key",
+    "aws_access_key",
+    "github_token",
+    "credential_literal_review"
+  ],
+  "block_findings": 0,
+  "review_findings": [
+    {
+      "path": "app/Core/TokenService.php",
+      "rule": "credential_literal_review",
+      "count": 2,
+      "severity": "review"
+    },
+    {
+      "path": "public/assets/vendor/mermaid-11.12.2/i18n-B4hKvn1K.js",
+      "rule": "credential_literal_review",
+      "count": 1,
+      "severity": "review"
+    },
+    {
+      "path": "tools/updater/release.py",
+      "rule": "credential_literal_review",
+      "count": 1,
+      "severity": "review"
+    },
+    {
+      "path": "update.php",
+      "rule": "credential_literal_review",
+      "count": 1,
+      "severity": "review"
+    }
+  ],
+  "sql_files": 5,
+  "status": "HOLD for manual privacy, licence and rights review; no public deployment",
+  "limitations": "Heuristic pattern scan only. Does not certify absence of secrets or personal data; no matched values retained.",
+  "credential_review": {
+    "reviewed": 5,
+    "fixed_credential_confirmed": 0,
+    "classification": [
+      {
+        "path": "app/Core/TokenService.php",
+        "count": 2,
+        "classification": "password-reset route/display literals"
+      },
+      {
+        "path": "public/assets/vendor/mermaid-11.12.2/i18n-B4hKvn1K.js",
+        "count": 1,
+        "classification": "translation literal"
+      },
+      {
+        "path": "tools/updater/release.py",
+        "count": 1,
+        "classification": "configuration-derived connection setting"
+      },
+      {
+        "path": "update.php",
+        "count": 1,
+        "classification": "configuration-derived connection setting"
+      }
+    ],
+    "scope": "Contextual review of five heuristic matches only. No matched values retained. Does not certify absence of credentials."
+  }
+}
