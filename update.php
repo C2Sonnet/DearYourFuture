@@ -40,20 +40,21 @@ if (PHP_SAPI !== 'cli') { http_response_code(403); exit; }
 umask(0077);
 ini_set('display_errors', 'stderr');
 
-// v3.0.0 normal operator update; unsigned package.
-final class KmmBatch79Contract {
-    public const TARGET='3.0.0';
-    public const OLD='2.6.1';
-    public const SOURCES=['2.6.1','2.7.1','2.7.2','2.7.3','2.7.4','2.7.5'];
-    public const PATH='resources/research/r07-batch79-candidate/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH79_20261124.json';
-    public const OLD_PATH='resources/research/r07-current/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH66_20261124.json';
-    public const OLD_SHA='31c5a2cc629600075cdad706ed763eadbfe7ef3cb290674b7da43ad052ce93a6';
-    public const SHA='6d42e6162cb649fdb00cfb17d9b5b1b116b214180e810dfe4b3518f3e3a421cc';
+// v3.1.0 normal operator update; unsigned package.
+final class KmmD200Contract {
+    public const TARGET='3.1.0';
+    public const OLD='3.0.0';
+    public const SOURCES=['3.0.0'];
+    public const PATH='resources/research/d2.0.0/runtime_snapshot.json';
+    public const OLD_PATH='resources/research/r07-batch79-candidate/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH79_20261124.json';
+    public const OLD_SHA='6d42e6162cb649fdb00cfb17d9b5b1b116b214180e810dfe4b3518f3e3a421cc';
+    public const SHA='c708cfb64aef74d68ac23afe9701a1b23a07d9025c5b77324bd6568701abaf1b';
+    public const ORIGINAL_SHA='0c175c0c3784c743e4e50dfa67e03953c5c52a70aafe224af4fc3c11655e1467';
     public static function validate(array $m,string $previous,int $oldSchema,array $sql,array $ddl,array $hashes):void {
-        if(($m['version']??null)!==self::TARGET||!in_array($previous,self::SOURCES,true)||$oldSchema!==41||($m['schema_version']??null)!==41||($m['variant']??null)!=='Private_Deployment'||$sql!==[]||$ddl!==[]||($m['migrations']??null)!==[]||($m['operator_apply_allowed']??null)!==true||($m['supported_update_from']??null)!==self::SOURCES||($m['deployment_allowed']??null)!==false||($m['external_acceptance_verified']??null)!==false)throw new RuntimeException('Batch79 update contract refused');
-        if(($m['catalogue_sync']??null)!==['path'=>self::PATH,'sha256'=>self::SHA,'companies'=>113,'jobs'=>146]||($hashes[self::PATH]??null)!==self::SHA)throw new RuntimeException('Batch79 source pin mismatch');
-        if(($hashes[self::OLD_PATH]??null)!==self::OLD_SHA)throw new RuntimeException('Batch66 source pin mismatch');
-        if(!is_array($m['files']??null)||array_diff_assoc($hashes,$m['files'])!==[]||array_diff_assoc($m['files'],$hashes)!==[])throw new RuntimeException('Batch79 manifest coverage mismatch');
+        if(($m['version']??null)!==self::TARGET||!in_array($previous,self::SOURCES,true)||$oldSchema!==41||($m['schema_version']??null)!==41||($m['variant']??null)!=='Private_Deployment'||$sql!==[]||$ddl!==[]||($m['migrations']??null)!==[]||($m['operator_apply_allowed']??null)!==true||($m['supported_update_from']??null)!==self::SOURCES||($m['deployment_allowed']??null)!==false||($m['external_acceptance_verified']??null)!==false)throw new RuntimeException('d2.0.0 update contract refused');
+        if(($m['catalogue_sync']??null)!==['path'=>self::PATH,'sha256'=>self::SHA,'companies'=>146,'jobs'=>181]||($hashes[self::PATH]??null)!==self::SHA||($m['research_original_sha256']??null)!==self::ORIGINAL_SHA)throw new RuntimeException('d2.0.0 runtime pin mismatch');
+        if(($hashes[self::OLD_PATH]??null)!==self::OLD_SHA)throw new RuntimeException('Batch79 historical source pin mismatch');
+        if(!is_array($m['files']??null)||array_diff_assoc($hashes,$m['files'])!==[]||array_diff_assoc($m['files'],$hashes)!==[])throw new RuntimeException('d2.0.0 manifest coverage mismatch');
     }
 }
 final class KmmCliUpdateException extends RuntimeException {}
@@ -152,7 +153,7 @@ final class KmmCliUpdater
         $this->lastStage = 'archive_validation';
         $this->readArchive($zipPath);
         $this->validateExisting(false);
-        KmmBatch79Contract::validate($this->manifest,$this->previous,$this->oldSchema,$this->sql,$this->schemaSql,$this->newHashes);
+        KmmD200Contract::validate($this->manifest,$this->previous,$this->oldSchema,$this->sql,$this->schemaSql,$this->newHashes);
         $this->buildPlan();
         $this->printPlan();
         if ($this->opts['db-compare']) { $this->validateExisting(true); $this->printDatabaseComparison(); }
@@ -172,7 +173,7 @@ final class KmmCliUpdater
             }
         }
         if($this->opts['operator-apply']){
-            if(($this->manifest['operator_apply_allowed']??false)!==true || $this->version!==KmmBatch79Contract::TARGET || !in_array($this->previous,KmmBatch79Contract::SOURCES,true) || $this->schema!==41 || $this->oldSchema!==41 || $this->sql!==[] || $this->schemaSql!==[])self::refuse('Wrong version transition');
+            if(($this->manifest['operator_apply_allowed']??false)!==true || $this->version!==KmmD200Contract::TARGET || !in_array($this->previous,KmmD200Contract::SOURCES,true) || $this->schema!==41 || $this->oldSchema!==41 || $this->sql!==[] || $this->schemaSql!==[])self::refuse('Wrong version transition');
             self::say('LOCAL OPERATOR AUTHORIZATION: SHA256 checked; offline/drained service confirmed by operator; unsigned; independent external test evidence has not been verified.');
         }else{
             if (($this->manifest['deployment_allowed'] ?? null) !== true) self::refuse('Release manifest does not authorize deployment');
@@ -197,7 +198,7 @@ final class KmmCliUpdater
     }
     private function usage(): string
     {
-        return "v3.0.0 (from v2.6.1, v2.7.1, v2.7.2, v2.7.3, v2.7.4 or v2.7.5).\n"
+        return "v3.1.0 (from v3.0.0).\n"
          . "  php update.php --zip=RELEASE.zip --sha256=TRUSTED_SHA256 --plan [--db-compare]\n"
          . "  php update.php --zip=RELEASE.zip --sha256=TRUSTED_SHA256 --apply --confirm --confirm-deletes --operator-apply --offline-confirm\n"
          . "  php update.php --selftest\n";
@@ -583,7 +584,7 @@ final class KmmCliUpdater
             $count=(int)$db->query('SELECT COUNT(*) FROM `'.$name.'`')->fetchColumn();
             $result['tables'][$name]=['present'=>true,'rows'=>$count];
         }
-        $research=$this->zip?->getFromName(KmmBatch79Contract::PATH);
+        $research=$this->zip?->getFromName(KmmD200Contract::PATH);
         if(is_string($research)){
             $master=json_decode($research,true,128,JSON_THROW_ON_ERROR);
             $result['source_catalogue']=['companies'=>count($master['companies']??[]),'jobs'=>count($master['jobs']??[]),
@@ -591,17 +592,29 @@ final class KmmCliUpdater
         }
         $q=$db->prepare('SELECT value_json FROM system_settings WHERE setting_key=?');$q->execute(['research.catalogue.current_snapshot']);$raw=$q->fetchColumn();
         
-        $expectedSha=$this->previous!=='2.6.1'?KmmBatch79Contract::SHA:KmmBatch79Contract::OLD_SHA;
+        $expectedSha=KmmD200Contract::OLD_SHA;
         if(!is_string($raw)||!hash_equals($expectedSha,hash('sha256',$raw)))self::refuse('Installed research snapshot mismatch');
         $q->execute(['research.catalogue.current_sha256']);if(json_decode((string)$q->fetchColumn(),true)!==$expectedSha)self::refuse('Installed research SHA setting mismatch');
         $q->execute(['weekly_report.state.v1']);$state=json_decode((string)$q->fetchColumn(),true);if(!is_array($state)||!is_int($state['cursor']??null)||!is_string($state['since']??null)||!is_string($state['next_due']??null))self::refuse('Existing weekly report state required');
         foreach(['since','next_due'] as $field){$date=DateTimeImmutable::createFromFormat(DATE_ATOM,$state[$field]);if(!$date||$date->format(DATE_ATOM)!==$state[$field])self::refuse('Invalid weekly state date');}
         if($state['cursor']<0||new DateTimeImmutable($state['next_due'])<=new DateTimeImmutable($state['since']))self::refuse('Invalid weekly state order');
         $q->execute(['research.catalogue.site_approved']);$adoption=json_decode((string)$q->fetchColumn(),true);
-        $expectedRelease=$this->previous==='2.6.1'?'d1.0.4 R07 Batch66':'d1.0.4 R07 Batch79';
+        $expectedRelease='d1.0.4 R07 Batch79';
         if(!is_array($adoption)||($adoption['release']??null)!==$expectedRelease||($adoption['review_status']??null)!=='partial_not_final')self::refuse('Installed adoption marker mismatch');
-        if($this->previous!=='2.6.1'&&(!in_array($adoption['site_version']??null,['2.7.1','2.7.2','2.7.3','2.7.4','2.7.5'],true)||version_compare($adoption['site_version'],$this->previous,'>')))self::refuse('Installed adoption version mismatch');
+        if(!in_array($adoption['site_version']??null,['2.7.1','2.7.2','2.7.3','2.7.4','2.7.5','3.0.0'],true))self::refuse('Installed adoption version mismatch');
         if((int)$db->query('SELECT @@max_allowed_packet')->fetchColumn()<16777216)self::refuse('max_allowed_packet must be >= 16 MiB');
+        if(!$this->opts['plan'])self::refuse('Use --db-compare with --plan in a separate invocation');
+        // The currently installed v3.0.0 has the stable mapping planner. No target code is loaded in this read-only process.
+        require_once $this->root.'/app/autoload.php';
+        $old=json_decode($raw,true,128,JSON_THROW_ON_ERROR);
+        $maps=$db->query("SELECT record_type,record_id,base_json FROM seed_entity_states WHERE seed_version IN ('research-d1.0.4-R06','research-d1.0.4-R07-site') AND record_type IN ('companies','jobs') LIMIT 10001")->fetchAll(PDO::FETCH_ASSOC);
+        if(count($maps)>10000)self::refuse('Mapping limit');
+        $companies=array_column($db->query('SELECT id FROM companies')->fetchAll(PDO::FETCH_ASSOC),null,'id');$jobs=array_column($db->query('SELECT id,company_id FROM jobs')->fetchAll(PDO::FETCH_ASSOC),null,'id');
+        \KMM\Core\ResearchBatch79Candidate::mappingPlan($old,$maps,$companies,$jobs);
+        $candidate=\KMM\Core\ResearchR07CanonicalSync::planFresh($master,$maps,$companies,$jobs);
+        if(array_map('count',$candidate['insert'])!==['companies'=>33,'jobs'=>35]||$candidate['mapped']!==['companies'=>146,'jobs'=>181])self::refuse('Unexpected research mapping plan');
+        foreach(['companies'=>'company_id','jobs'=>'job_id'] as $kind=>$key){$expected=array_diff(array_column($master[$kind],$key),array_column($old[$kind],$key));$actual=array_keys($candidate['insert'][$kind]);sort($expected);sort($actual);if($actual!==$expected)self::refuse('Unexpected source addition IDs');}
+        $result['new_canonical_rows']=['companies'=>33,'jobs'=>35,'mappings'=>68];$result['mapped_source_ids']=$candidate['mapped'];
         $result['installed_snapshot_verified']=true;$result['weekly_state_present']=true;$result['max_allowed_packet']=(int)$db->query('SELECT @@max_allowed_packet')->fetchColumn();
         self::say('DB COMPARISON (READ ONLY): '.json_encode($result,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR));
     }
@@ -752,17 +765,6 @@ final class KmmCliUpdater
               'backup_basename'=>basename($this->backupRoot),'started_utc'=>gmdate('c')]));
             $this->lastStage='preflight_schema';
             $this->checkSchemaOperations();
-            // Capture the previous approved research JSON before replacing site files.
-            foreach(glob($this->root.'/resources/research/r07-current/COMPANY_JOB_RELATIONS_*.json')?:[] as $candidate){
-                if(!is_file($candidate)||is_link($candidate))continue;
-                $oldData=json_decode((string)file_get_contents($candidate),true,128);
-                if(is_array($oldData)){$this->oldCatalogue=$oldData;break;}
-            }
-            $spec=$this->manifest['catalogue_sync']??null;
-            if(is_array($spec)&&is_string($spec['path']??null)){
-                $newData=$this->zip?->getFromName($spec['path']);
-                if(is_string($newData)){$value=json_decode($newData,true,128);if(is_array($value))$this->newCatalogue=$value;}
-            }
             $this->lastStage='stage_and_file_backup';
             $this->stageAndCopyOriginals();
             $this->lastStage='lint_staged_php';
@@ -783,15 +785,11 @@ final class KmmCliUpdater
             // All user application IDs and selection states are captured under row locks.
             require_once $this->root.'/app/autoload.php';
             // The versioned stage checks the complete protected data set; no separate application mutations.
-            $this->lastStage='batch79_versioned_stage';
-            $oldRaw=$this->zip?->getFromName('resources/research/r07-current/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH66_20261124.json');
-            $newRaw=$this->zip?->getFromName(KmmBatch79Contract::PATH);
+            $this->lastStage='d200_versioned_stage';
+            $oldRaw=$this->zip?->getFromName(KmmD200Contract::OLD_PATH);
+            $newRaw=$this->zip?->getFromName(KmmD200Contract::PATH);
             if(!is_string($oldRaw)||!is_string($newRaw)||!$this->pdo)self::refuse('Pinned source bytes missing');
-            if($this->previous!=='2.6.1'){
-                \KMM\Core\ResearchBatch79AtomicRehearsal::stageSameSource($this->pdo,$newRaw,$this->installLock['install_id'],'OPERATOR_UPDATE:'.KmmBatch79Contract::SHA,$this->previous);
-            }else{
-                \KMM\Core\ResearchBatch79AtomicRehearsal::stageVersioned($this->pdo,$oldRaw,$newRaw,$this->installLock['install_id'],'OPERATOR_UPDATE:'.KmmBatch79Contract::SHA,true);
-            }
+            \KMM\Core\ResearchD200Upgrade::stage($this->pdo,$oldRaw,$newRaw,$this->installLock['install_id'],'OPERATOR_UPDATE:'.KmmD200Contract::SHA);
             // The stage verifies protected data before commit.
             $this->lastStage='commit_database';
             // Ambiguous COMMIT cannot be called rolled-back without restoring the sealed SQL backup.

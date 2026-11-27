@@ -86,7 +86,7 @@ final class Installer {
         $html.='<fieldset><legend>③ 必須：初期DEVELOPER</legend><label>ユーザーID<input name="dev_handle" required minlength="3" maxlength="40" autocomplete="off"></label><label>表示名<input name="dev_name" required maxlength="120"></label><label>メール<input type="email" name="dev_email" required maxlength="254"></label><label>パスワード<input type="password" name="dev_pass" required minlength="8" autocomplete="new-password"></label><label>パスワード確認<input type="password" name="dev_pass_confirm" required minlength="8" autocomplete="new-password"></label></fieldset>';
         $html.='<aside class="note">初期アバターは登録した表示名またはユーザーIDから自動生成されます。画像のアップロードは不要で、本人の画像に変更すると初期画像は削除されます。</aside>';
         $html.='<aside class="note"><strong>新規設置専用：</strong>選択するMySQLデータベースには、テーブルやビューが一つも存在しない必要があります。旧設置DBを使う場合は復旧手順を利用し、初期設置を再実行しないでください。</aside>';
-        $html.='<aside class="note">初回設置では旧Seed10・調査27・リンク59とR06初期データを保全し、Batch79の不足13企業・23求人を同じトランザクションで追加します。公開用研究カタログは113企業・146求人（原ID単位）です。旧R06非公開行は維持し、募集継続・個別応募可能とは断定しません。</aside>';
+        $html.='<aside class="note">初回設置では旧Seed10・調査27・リンク59とR06初期データを保全し、d2.0.0の不足46企業・58求人を同じトランザクションで追加します。公開用研究カタログは113企業・146求人（原ID単位）です。旧R06非公開行は維持し、募集継続・個別応募可能とは断定しません。</aside>';
         $html.='<aside class="note">初期設定：共通パスワードOFF／未ログイン閲覧OFF／パスワードリセットON／自己登録OFF。SMTPは開発者のログイン後に設定します。</aside><button class="btn primary">確認してサイトを設置する</button></form>';
         Kernel::layout('初期設定',$html,false);
     }
@@ -130,7 +130,7 @@ final class Installer {
                 self::form('配布パッケージに初期データの検証用ファイルが不足、または不一致です。DBと設置設定は変更していません。正しい配布ZIPを管理者が確認してください。');
                 return;
             }
-            $stage='batch79_integrity_preflight';
+            $stage='d200_integrity_preflight';
             ResearchR07CanonicalSync::inspectSource();
             $stage='db_connection';
             $db=Database::open($conf); // Test connectivity before schema creation.

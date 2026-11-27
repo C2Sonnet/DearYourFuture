@@ -18,7 +18,7 @@ final class Pages {
         ['label'=>'企業情報','items'=>[['label'=>'企業を探す','url'=>'/companies'],['label'=>'企業マップ','url'=>'/map'],['label'=>'資料ライブラリ','url'=>'/library']]],
         ['label'=>'求人情報','items'=>[['label'=>'求人を探す','url'=>'/jobs'],['label'=>'求人時間軸','url'=>'/jobs/timeline']]],
         ['label'=>'選考管理','items'=>[['label'=>'就活進展','url'=>'/applications'],['label'=>'マイリスト','url'=>'/my']]],
-        ['label'=>'その他','items'=>[['label'=>'変更履歴','url'=>'/activity'],['label'=>'ガイド','url'=>'/guide'],['label'=>'サイト資源','url'=>'/site-resources'],['label'=>'データ集計','url'=>'/admin/data/statistics','admin_only'=>true],['label'=>'開発資料','url'=>'/admin/development','admin_only'=>true]]],
+        ['label'=>'その他','items'=>[['label'=>'変更履歴','url'=>'/activity'],['label'=>'ガイド','url'=>'/guide'],['label'=>'サイト資源','url'=>'/site-resources'],['label'=>'コード公開','url'=>'https://proj-mina.c2s.me'],['label'=>'データ集計','url'=>'/admin/data/statistics','admin_only'=>true],['label'=>'開発資料','url'=>'/admin/development','admin_only'=>true]]],
     ];
     public const SECTIONS = [
         '/companies'=>['title'=>'企業を探す','intro'=>'場所や仕事の内容、資料を比べながら、気になる企業を見つけましょう。','links'=>[['/companies/compare','企業比較'],['/applications/timeline','全企業の時間軸'],['/map','企業の位置を見る']]],

@@ -7,7 +7,7 @@ final class ResearchClassification {
     public const CANDIDATE=['A_優先応募確認候補'=>'優先応募確認候補','B_条件付き候補'=>'条件付き候補','C_対象外・旧募集終了'=>'対象外・旧募集終了','D_HOLD'=>'確認保留'];
     public static function data():array {
         if(self::$index!==null)return self::$index;
-        $h=ResearchBatch79Candidate::projection();$comp=$h;$out=['jobs'=>[],'companies'=>[],'comparison'=>[],'summary'=>$h['summary']];
+        $h=ResearchD200::projection();$comp=$h;$out=['jobs'=>[],'companies'=>[],'comparison'=>[],'summary'=>$h['summary']];
         foreach($h['jobs'] as $v)foreach(explode(';',$v['raw_job_ids']) as $id)$out['jobs'][$id]=$v;
         foreach($h['companies'] as $v)foreach(explode(';',$v['raw_company_ids']) as $id)$out['companies'][$id]=$v;
         foreach($comp['comparison'] as $v)foreach(explode(';',$v['raw_job_ids']) as $id)$out['comparison'][$id]=$v;
@@ -38,6 +38,9 @@ final class ResearchClassification {
         if(($x['batch79_freshness_attempted']??null)===true)$p['公開情報の点検']='点検実施済み（現在受付の認定ではありません）';
         $p['現在の受付確認']=($x['current_receipt_verified']??null)===true?'確認済み':'未認定';
         $p['本人確認']='調査対象外（N/A）';
+        // Keep later notes on their own evidence/course boundaries. Do not promote them to verified facts.
+        $extra=[];foreach([$x,$d['comparison'][$id]??[]] as $row)foreach($row as $k=>$v)if(is_string($v)&&$v!==''&&preg_match('/\Abatch(8[0-9]|9[0-9]|1[0-4][0-9])_note\z/D',$k,$m))$extra[(int)$m[1]]=$v;
+        krsort($extra);foreach($extra as $batch=>$note)$p['追加調査記録 Batch'.$batch]=$note;
         $raw=ResearchR07::job($id);$rawForm=ResearchR07::firstValue($raw['employment_type']??null);
         if(in_array($rawForm,['正社員','契約社員'],true)&&in_array($p['初期雇用形態'],['種類不明','不明','未確定'],true)){
             $p['雇用形態（掲載記録）']=$rawForm;$p['雇用形態の補足']='初期雇用形態が不明とする資料もあります。入社時の契約条件を再確認してください。';

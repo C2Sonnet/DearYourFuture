@@ -20,14 +20,14 @@ $flags=[
     'update_lock'=>(file_exists(SiteState::existingLockPath('update'))||is_link(SiteState::existingLockPath('update'))),
     'app_key'=>(file_exists($root.'/storage/private/app.key')||is_link($root.'/storage/private/app.key')),
 ];
-try{ResearchR07CanonicalSync::inspectSource();$batch79=true;}catch(\Throwable){$batch79=false;}
+try{ResearchR07CanonicalSync::inspectSource();$d200=true;}catch(\Throwable){$d200=false;}
 $phase=SiteState::installationPhase($flags['database_config'],$flags['install_lock'],$flags['update_lock'],$flags['incomplete_install']);
 if($phase==='new'&&$flags['app_key'])$phase='recovery';
 $report=[
     'mode'=>'READ_ONLY',
-    'installation_allowed'=>$result['ok']&&$batch79&&$phase==='new'&&version_compare(PHP_VERSION,'8.4','>=')&&extension_loaded('pdo_mysql')&&extension_loaded('mbstring')&&defined('PASSWORD_ARGON2ID'),
+    'installation_allowed'=>$result['ok']&&$d200&&$phase==='new'&&version_compare(PHP_VERSION,'8.4','>=')&&extension_loaded('pdo_mysql')&&extension_loaded('mbstring')&&defined('PASSWORD_ARGON2ID'),
     'initial_install_status'=>'IMPLEMENTED_PENDING_REAL_ACCEPTANCE',
-    'batch79_source_integrity'=>$batch79,
+    'd200_source_integrity'=>$d200,
     'database_emptiness'=>'NOT_CHECKED',
     'release_version'=>trim((string)file_get_contents($root.'/VERSION')),
     'package'=>$result,
@@ -47,4 +47,4 @@ $report=[
     'secrets_printed'=>false,
 ];
 echo json_encode($report,JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT|JSON_THROW_ON_ERROR)."\n";
-exit($result['ok']&&$batch79?0:3);
+exit($result['ok']&&$d200?0:3);

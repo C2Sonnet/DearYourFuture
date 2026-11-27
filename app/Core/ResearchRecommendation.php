@@ -71,7 +71,8 @@ final class ResearchRecommendation {
         'JOB-0071','JOB-0073','JOB-0119','JOB-0123','JOB-0126',
     ];
     public static function recommendationEligible(array $job):bool {
-        return !in_array($job['job_id']??null,self::CLOSED_OR_CONFLICT_IDS,true);
+        $id=$job['job_id']??null;$classification=ResearchClassification::data()['jobs'][$id]['application_class']??null;
+        return !in_array($id,self::CLOSED_OR_CONFLICT_IDS,true)&&in_array($classification,['A_優先応募確認候補','B_条件付き候補'],true);
     }
     private static function excluded(PDO $db,int $uid):array {
         $q=$db->prepare('SELECT DISTINCT company_id FROM application_tracks WHERE user_id=? AND archived_at IS NULL UNION SELECT company_id FROM user_favorite_companies WHERE user_id=?');

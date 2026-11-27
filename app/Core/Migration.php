@@ -46,7 +46,7 @@ final class Migration {
             // Source-pinned R06 companies/jobs are added atomically after the
             // preserved Seed10/legacy research corpus, before installation ready.
             InitialResearchSql::apply($db,$userId);
-            // Fresh installations register the pinned current Batch79 records as well.
+            // Fresh installations register the pinned current d2.0.0 records as well.
             // Existing R06/user-owned records are never overwritten.
             ResearchR07CanonicalSync::sync($db);
             WeeklyReport::initialize($db,new \DateTimeImmutable('now',new \DateTimeZone('Asia/Tokyo')));

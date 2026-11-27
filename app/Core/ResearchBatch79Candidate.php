@@ -6,18 +6,18 @@ final class ResearchBatch79Candidate {
     private const PIN='2c77d48d7e8050143b1ce3c868fd5fdc63d872dd39fd1467a281e14395113af2';
     private static ?array $projection=null;
     public static function pin():array {
-        $path=ResearchR07::root().'/candidate_pin.json';$raw=file_get_contents($path);
+        $path=SiteState::root().'/resources/research/r07-batch79-candidate/candidate_pin.json';$raw=file_get_contents($path);
         if(!is_string($raw)||!hash_equals(self::PIN,hash('sha256',$raw)))throw new \RuntimeException('Candidate pin mismatch');
         $p=json_decode($raw,true,16,JSON_THROW_ON_ERROR);
-        if($p['production_approved']!==false||$p['source_status']!=='partial_not_final'||$p['source_sha256']!==ResearchR07::FILE_SHA256)throw new \RuntimeException('Invalid candidate metadata');
+        if($p['production_approved']!==false||$p['source_status']!=='partial_not_final'||$p['source_sha256']!=='6d42e6162cb649fdb00cfb17d9b5b1b116b214180e810dfe4b3518f3e3a421cc')throw new \RuntimeException('Invalid candidate metadata');
         return $p;
     }
     public static function projection():array {
         $p=self::pin();if(self::$projection!==null)return self::$projection;
-        $raw=file_get_contents(ResearchR07::root().'/projection.json');
+        $raw=file_get_contents(SiteState::root().'/resources/research/r07-batch79-candidate/projection.json');
         if(!is_string($raw)||!hash_equals($p['projection_sha256'],hash('sha256',$raw)))throw new \RuntimeException('Projection integrity mismatch');
         $v=json_decode($raw,true,128,JSON_THROW_ON_ERROR);
-        if($v['production_approved']!==false||$v['source_sha256']!==ResearchR07::FILE_SHA256||count($v['companies'])!==112||count($v['jobs'])!==145||count($v['comparison'])!==41)throw new \RuntimeException('Invalid projection');
+        if($v['production_approved']!==false||$v['source_sha256']!=='6d42e6162cb649fdb00cfb17d9b5b1b116b214180e810dfe4b3518f3e3a421cc'||count($v['companies'])!==112||count($v['jobs'])!==145||count($v['comparison'])!==41)throw new \RuntimeException('Invalid projection');
         foreach(array_merge($v['jobs'],$v['comparison']) as $r)foreach(['active_slots_verified','personal_visa_verified','initial_assignment_guaranteed','strict_40min_verified','current_receipt_verified'] as $key)if(($r[$key]??null)!==false)throw new \RuntimeException('Unconfirmed condition changed');
         return self::$projection=$v;
     }
@@ -31,6 +31,14 @@ final class ResearchBatch79Candidate {
     public static function weeklyViews(array $d):array {
         $legacy=$d['r07_batch65_handover']??[];$old=['companies'=>$legacy['companies']??[],'jobs'=>$legacy['jobs']??[],'comparison'=>$d['r07_batch66_comparison']['comparison']??[]];
         $latest=$d['r07_batch79_final_public_scope']??null;
+        $modern=$d['site_latest_views']??null;
+        if($modern!==null){
+            if(!is_array($modern)||array_map('count',$modern)!==['companies'=>145,'jobs'=>180,'comparison'=>79])throw new \RuntimeException('Invalid d2.0.0 weekly views');
+            $out=[];foreach($old as $kind=>$template){
+                $keys=array_keys($template[0]??[]);if(!$keys)throw new \RuntimeException('Missing comparison schema');$out[$kind]=[];
+                foreach($modern[$kind] as $row){$r=[];foreach($keys as $k){$v=$row[$k]??null;if(in_array($k,['active_slots_verified','personal_visa_verified','initial_assignment_guaranteed','strict_40min_verified'],true)&&$v!==false)throw new \RuntimeException('Unexpected verified flag');if($k==='fixed_overtime_hours_record'&&$v!==null)$v=self::hoursValue($v);$r[$k]=$v;} $out[$kind][]=$r;}
+            }return $out;
+        }
         $out=[];foreach($old as $kind=>$template){
             $rows=$latest===null?$template:($latest[match($kind){'companies'=>'latest_company_view','jobs'=>'latest_job_view','comparison'=>'latest_comparison'}]??throw new \RuntimeException('Latest research view missing'));
             if($latest!==null&&$template===[])throw new \RuntimeException('Prior semantic schema missing');

@@ -3,28 +3,28 @@ declare(strict_types=1);
 namespace KMM\Core;
 use PDO;
 
-/** Pinned d1.0.4 R07 Batch79 current catalogue.
+/** Pinned d2.0.0 current catalogue.
  * The R07 source has its own partial/not-final research-review status; site adoption
  * does not certify each job's recruiting status or applicant eligibility.
  * Research originals, user-created records, and R06 historical seed are not rewritten.
  */
 final class ResearchR07 {
-    public const RELEASE = 'd1.0.4 R07 Batch79（サイト収録データ集）';
-    public const FILE_SHA256 = '6d42e6162cb649fdb00cfb17d9b5b1b116b214180e810dfe4b3518f3e3a421cc';
+    public const RELEASE = 'd2.0.0（サイト収録データ集・不足記録付き）';
+    public const FILE_SHA256 = 'c708cfb64aef74d68ac23afe9701a1b23a07d9025c5b77324bd6568701abaf1b';
     private static ?array $snapshot = null;
     private static ?array $lookups = null;
     private static ?array $mapping = null;
     private static ?array $reviews = null;
     private static ?array $ledger = null;
-    public static function root():string {return SiteState::root().'/resources/research/r07-batch79-candidate';}
+    public static function root():string {return SiteState::root().'/resources/research/d2.0.0';}
     public static function data():array {
-        ResearchBatch79Candidate::pin();
+        ResearchD200::pin();
         if(self::$snapshot!==null)return self::$snapshot;
-        $path=self::root().'/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH79_20261124.json';
+        $path=self::root().'/runtime_snapshot.json';
         if(!is_file($path)||!hash_equals(self::FILE_SHA256,(string)hash_file('sha256',$path)))
             throw new \RuntimeException('R07 source integrity mismatch');
         $d=json_decode((string)file_get_contents($path),true,128,JSON_THROW_ON_ERROR);
-        if(!is_array($d)||count($d['companies']??[])!==113||count($d['jobs']??[])!==146)
+        if(!is_array($d)||count($d['companies']??[])!==146||count($d['jobs']??[])!==181)
             throw new \RuntimeException('Unsupported R07 research release');
         $companies=[];$jobs=[];
         foreach($d['companies'] as $company){

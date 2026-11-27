@@ -43,12 +43,12 @@ final class ResearchR07CanonicalSync {
         return ['insert'=>$new,'mapped'=>$verified['mapped'],'existing_rows_overwritten'=>0,'existing_rows_deleted'=>0];
     }
     private static function fixedId(string $type,string $sourceId):string{return hash('md5','kmm:r07-site:'.$type.':'.$sourceId);}
-    private const SOURCE='resources/research/r07-batch79-candidate/COMPANY_JOB_RELATIONS_d1.0.4_R07_BATCH79_20261124.json';
+    private const SOURCE='resources/research/d2.0.0/runtime_snapshot.json';
     public static function inspectSource():array {
         $raw=file_get_contents(SiteState::root().'/'.self::SOURCE);
-        if(!is_string($raw)||strlen($raw)>8000000||!hash_equals(ResearchR07::FILE_SHA256,hash('sha256',$raw)))throw new \RuntimeException('Batch79 source integrity mismatch');
-        $data=ResearchR07::data();ResearchBatch79Candidate::projection();ResearchR07Scope::ids();ResearchR07FieldIndex::rows('companies','CO-0001');
-        if(json_decode($raw,true,128,JSON_THROW_ON_ERROR)!==$data)throw new \RuntimeException('Batch79 source readback mismatch');
+        if(!is_string($raw)||strlen($raw)>8000000||!hash_equals(ResearchR07::FILE_SHA256,hash('sha256',$raw)))throw new \RuntimeException('d2.0.0 source integrity mismatch');
+        $data=ResearchR07::data();ResearchD200::projection();ResearchR07Scope::ids();ResearchR07FieldIndex::rows('companies','CO-0001');
+        if(json_decode($raw,true,128,JSON_THROW_ON_ERROR)!==$data)throw new \RuntimeException('d2.0.0 source readback mismatch');
         return ['raw'=>$raw,'data'=>$data];
     }
     private static function rows(PDO $db):array {
@@ -71,14 +71,14 @@ final class ResearchR07CanonicalSync {
         [$states,$companies,$jobs]=self::rows($db);
         if(count($states)!==231||count($companies)!==103||count($jobs)!==128)throw new \RuntimeException('Expected pinned R06 canonical seed missing');
         $plan=self::planFresh($data,$states,$companies,$jobs);
-        if(count($plan['insert']['companies'])!==13||count($plan['insert']['jobs'])!==23)throw new \RuntimeException('Unexpected Batch79 fresh seed plan');
-        $checked=self::date($data['checked_date']??null);if($checked===null)throw new \RuntimeException('Invalid Batch79 date');
+        if(count($plan['insert']['companies'])!==46||count($plan['insert']['jobs'])!==58)throw new \RuntimeException('Unexpected d2.0.0 fresh seed plan');
+        $checked=self::date($data['checked_date']??null);if($checked===null)throw new \RuntimeException('Invalid d2.0.0 date');
         $version=trim((string)file_get_contents(SiteState::root().'/VERSION'));
         if(!preg_match('/\A[0-9]+\.[0-9]+\.[0-9]+\z/D',$version))throw new \RuntimeException('Invalid site version');
         $co=$db->prepare("INSERT INTO companies(id,display_name,legal_name,description,visibility,created_by,updated_by) VALUES (?,?,?,?, 'published',NULL,NULL)");
         $jo=$db->prepare("INSERT INTO jobs(id,company_id,title,category,graduate_year,recruitment_state,observed_on,deadline_on,note) VALUES (?,?,?,'other',?,'unverified',?,?,?)");
         $map=$db->prepare('INSERT INTO seed_entity_states(seed_key,record_type,record_id,company_id,base_json,seed_version,source_document,source_checked_on) VALUES (?,?,?,?,?,?,?,?)');
-        $meta=['source_release'=>'d1.0.4 R07 Batch79','catalogue_sha256'=>ResearchR07::FILE_SHA256];
+        $meta=['source_release'=>'d2.0.0','source_original_sha256'=>ResearchD200::ORIGINAL_SHA,'catalogue_sha256'=>ResearchR07::FILE_SHA256];
         $encode=static fn($v)=>json_encode($v,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
         $write=static function(\PDOStatement $q,array $args):void {if(!$q->execute($args))throw new \RuntimeException('Fresh seed write failed');};
         foreach($plan['insert']['companies'] as $id=>$uuid){$r=ResearchR07::company($id);$name=self::text240(ResearchR07::displayName($r));
@@ -89,12 +89,12 @@ final class ResearchR07CanonicalSync {
             $write($jo,[$uuid,$parent,self::text240(ResearchR07::jobTitle($r)),$year,$checked,$date,'R07サイト収録記録。現在募集・応募可能とは限りません。 元ID: '.$id]);
             $write($map,['r07-site:jobs:'.$id,'jobs',$uuid,$parent,$encode(['source_job_id'=>$id,'source_company_id'=>$r['company_id']]+$meta),self::SEED_VERSION,self::SOURCE,$checked]);}
         [$afterStates,$afterCo,$afterJo]=self::rows($db);
-        if(count($afterStates)!==267||count($afterCo)!==116||count($afterJo)!==151)throw new \RuntimeException('Fresh seed count mismatch');
+        if(count($afterStates)!==335||count($afterCo)!==149||count($afterJo)!==186)throw new \RuntimeException('Fresh seed count mismatch');
         $verified=ResearchBatch79Candidate::mappingPlan($data,$afterStates,$afterCo,$afterJo);
         $setting=$db->prepare('INSERT INTO system_settings(setting_key,value_json) VALUES (?,?)');
-        $values=['research.catalogue.current_snapshot'=>$raw,'research.catalogue.current_sha256'=>$encode(ResearchR07::FILE_SHA256),'research.catalogue.site_approved'=>$encode(['release'=>'d1.0.4 R07 Batch79','companies'=>113,'jobs'=>146,'review_status'=>'partial_not_final','production_approved'=>false,'site_version'=>$version,'server_verified_at'=>gmdate('c')])];
+        $values=['research.catalogue.current_snapshot'=>$raw,'research.catalogue.current_sha256'=>$encode(ResearchR07::FILE_SHA256),'research.catalogue.site_approved'=>$encode(['release'=>'d2.0.0','companies'=>146,'jobs'=>181,'review_status'=>'released_with_documented_limitations','source_original_sha256'=>ResearchD200::ORIGINAL_SHA,'production_approved'=>false,'site_version'=>$version,'server_verified_at'=>gmdate('c')])];
         foreach($values as $k=>$v){$write($setting,[$k,$v]);$q=$db->prepare('SELECT value_json FROM system_settings WHERE setting_key=?');$q->execute([$k]);if($q->fetchColumn()!==$v)throw new \RuntimeException('Fresh snapshot readback mismatch');}
         ResearchR07::invalidateMapping();
-        return ['new_companies'=>13,'new_jobs'=>23,'current_companies'=>$verified['mapped']['companies'],'current_jobs'=>$verified['mapped']['jobs']];
+        return ['new_companies'=>46,'new_jobs'=>58,'current_companies'=>$verified['mapped']['companies'],'current_jobs'=>$verified['mapped']['jobs']];
     }
 }
